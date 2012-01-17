@@ -1,0 +1,21 @@
+asdfhostname
+[# #]/bin/sleep 20
+[#-1#]/bin/hostname
+[# 1-2 #]/bin/sleep 15
+[# 6 #]/bin/sleep 10
+/bin/sleep 5
+#[##]
+
+
+ 
+
+#task 11
+[#-2#]task 12
+#task 13
+#task 14
+#task 15
+#task 16
+#[#11-14,16#] task 17
+#[#11-14,16#] task 18
+#task 19
+#[#11-13,15-17#]task 20
