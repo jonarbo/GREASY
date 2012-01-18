@@ -55,9 +55,14 @@ void GreasyEngine::baseInit ( ) {
    
   log->record(GreasyLog::devel, "GreasyEngine::init", "Entering...");
   
-  log->record(GreasyLog::silent,"Start greasing " + taskFile);
+  log->record(GreasyLog::silent,"Start greasing " + getWorkingDir() + "/" + taskFile);
   parseTaskFile();
   checkDependencies();
+  
+  if ((validTasks.size() != taskMap.size())&&(!strictChecking)) {
+    log->record(GreasyLog::warning,  "Invalid tasks found. Greasy will ignore them");  
+  }
+  
   if (!fileErrors) { 
     ready = true;
     log->record(GreasyLog::info,  "Engine " + toUpper(engineType) + " ready to run");  
@@ -79,7 +84,7 @@ void GreasyEngine::baseFinalize() {
     if (it->second) delete(it->second);
   }
   
-  log->record(GreasyLog::silent,"Finished greasing " + taskFile);
+  log->record(GreasyLog::silent,"Finished greasing " + getWorkingDir() + "/" + taskFile);
   
 }
 
@@ -186,12 +191,9 @@ void GreasyEngine::checkDependencies() {
 
     list<int> deps = task->getDependencies();
     list<int>::iterator dep;
-//    list<int>::iterator rdep;
-//    log->record(GreasyLog::devel, "GreasyEngine::checkDependencies",
-// 		"Checking task "+ toString(it->first) + " dependencies...");
     for (dep=deps.begin();dep!=deps.end();dep++) {
-      
-      if ((dep->getTaskId() < task->getTaskId())
+      if ((taskMap.find(*dep)!=taskMap.end())
+	&& (taskMap[*dep]->getTaskId() < task->getTaskId())
 	&&(validTasks.find(*dep)!=validTasks.end())) {
 	//The task is valid
 	revDepMap[*dep].push_back(it->first);
@@ -239,9 +241,12 @@ void GreasyEngine::baseWriteRestartFile() {
   GreasyTask *task;
   map<int,GreasyTask*>::iterator it;
   list<int> dependants;
+  set<GreasyTask*> invalidTasks;
   list<int>::iterator lit;
+  set<GreasyTask*>::iterator sit;
   int nindex;
   ofstream rstfile( restartFile.c_str(), ios_base::out);
+
   
   log->record(GreasyLog::devel, "GreasyEngine::writeRestartFile", "Entering...");
 
@@ -250,12 +255,12 @@ void GreasyEngine::baseWriteRestartFile() {
       return;
   }
   
-  log->record(GreasyLog::info, "Creating restart file " + restartFile + "...");
+  log->record(GreasyLog::info, "Creating restart file " + getWorkingDir() + "/" + restartFile + "...");
   
   
   rstfile << "# " << endl;
   rstfile << "# Greasy restart file generated at "<< GreasyTimer::now() << endl;
-  rstfile << "# Original task file: " << taskFile << endl;
+  rstfile << "# Original task file: " << getWorkingDir() << "/" << taskFile << endl;
   rstfile << "# " << endl;
   rstfile << endl;
   
@@ -267,6 +272,12 @@ void GreasyEngine::baseWriteRestartFile() {
     // Completed tasks will not be recorded in the restart file
     if (task->getTaskState() == GreasyTask::completed) continue;
     
+    // Invalid tasks will be treated at the end
+    if (task->getTaskState() == GreasyTask::invalid) {
+      invalidTasks.insert(task);
+      continue;
+    }
+    
     if (task->getTaskState() == GreasyTask::failed) {
       rstfile << "# Warning: The following task failed!" << endl; 
       nindex++;
@@ -275,13 +286,6 @@ void GreasyEngine::baseWriteRestartFile() {
     if (task->getTaskState() == GreasyTask::cancelled) {
       rstfile << "# Warning: The following task was canceled due to a dependency failure!" << endl; 
       nindex++;
-    }
-    
-    //TODO: Arreglar el tema de los invalidos
-    if (task->getTaskState() == GreasyTask::invalid) {
-      rstfile << "# Warning: The following task was invalid!" << endl; 
-      nindex++;
-      rstfile << "# ";
     }
     
     // Write the task in the restart with its dependencies if any
@@ -302,6 +306,23 @@ void GreasyEngine::baseWriteRestartFile() {
     nindex++;
 
   }
+  
+  if (!invalidTasks.empty()) {
+    
+    rstfile << endl << "# Invalid tasks were found. Check these lines on " << taskFile << ": " << endl << "# ";
+    bool first = true;
+    for (sit=invalidTasks.begin();sit!=invalidTasks.end(); sit++) {    
+      task = *sit;
+      if (first) {
+	rstfile << toString(task->getTaskId());
+	first = false;
+      } else {
+	 rstfile << ", " << toString(task->getTaskId());
+      }
+    }
+    rstfile << endl;
+  }
+  
   
   rstfile << endl << "# End of restart file" << endl;
 
@@ -357,6 +378,10 @@ void GreasyEngine::buildFinalSummary() {
 			      " CANCELLED, " + toString(invalid) + " INVALID.");
   log->record(GreasyLog::info,"Total time: " + globalTimer.getElapsed());
   log->record(GreasyLog::info,"Resource Utilization: " + toString(rup) +"%" );
+  
+  // Write a restart if we find not completed tasks
+  if (failed + cancelled + invalid > 0) writeRestartFile();
+  
   log->record(GreasyLog::devel, "GreasyEngine::buildFinalSummary", "Exiting...");
   
 }

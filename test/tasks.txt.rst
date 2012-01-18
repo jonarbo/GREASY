@@ -1,15 +1,15 @@
 # 
-# Greasy restart file generated at 2012-01-16 16:04:13
-# Original task file: ../test/tasks.txt
+# Greasy restart file generated at 2012-01-17 16:40:35
+# Original task file: /home/xabellan/svn/greasy/branch/greasy-2/src/../test/tasks.txt
 # 
 
-# Warning: The following task failed!
 asdfhostname
 /bin/sleep 20
-[# 8 #] /bin/hostname
-[# 7,8 #] /bin/sleep 15
-[# 9 #] /bin/sleep 10
-# Warning: The following task was invalid!
-# [# 12 #] task 12
+[# 7 #] /bin/hostname
+[# 6,7 #] /bin/sleep 15
+/bin/sleep 5
+
+# Invalid tasks were found. Check these lines on ../test/tasks.txt: 
+# 5, 13
 
 # End of restart file

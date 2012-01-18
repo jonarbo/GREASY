@@ -93,7 +93,7 @@ void MPIEngine::run() {
     else log->record(GreasyLog::error,  "Could not run MPI engine");
   } else {
     if (isMaster()) {
-      log->record(GreasyLog::error, "Engine is not ready to run. Check your task file.");
+      log->record(GreasyLog::error, "Engine is not ready to run. Check your task file and configuration.");
       fireWorkers();
     }
   }
@@ -287,7 +287,7 @@ void MPIEngine::updateDependencies(GreasyTask* parent) {
       }
     }
     else if ((state == GreasyTask::failed)||(state == GreasyTask::cancelled)) {
-      log->record(GreasyLog::error,  "Cancelling task " + toString(child->getTaskId()));
+      log->record(GreasyLog::warning,  "Cancelling task " + toString(child->getTaskId()) + " because of task " + toString(taskId) + " failure");
       log->record(GreasyLog::devel, "MPIEngine::updateDependencies", "Parent failed: cancelling task and removing it from blocked");
       child->setTaskState(GreasyTask::cancelled);
       blockedTasks.erase(child);

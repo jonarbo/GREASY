@@ -92,5 +92,16 @@ inline string toUpper(string& s) {
   
 }
 
+/**
+  * Inline function to get the working dir.
+  * @return The string containing the current working dir.
+  */
+inline string getWorkingDir() {
+ 
+  char temp[4096];
+  return ( getcwd(temp, 4096) ? std::string( temp ) : std::string("") );
+
+}
+
 
 #endif
