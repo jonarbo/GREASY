@@ -159,7 +159,7 @@ void GreasyTask::addDependency(int parentTask) {
   if ((parentTask != taskId)&&(parentTask>0))
     dependencies.push_back(parentTask);
   
-  setTaskState(GreasyTask::blocked);
+  if (isWaiting()) setTaskState(GreasyTask::blocked);
   
 }
 

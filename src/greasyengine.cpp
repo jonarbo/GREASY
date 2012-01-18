@@ -279,12 +279,12 @@ void GreasyEngine::baseWriteRestartFile() {
     }
     
     if (task->getTaskState() == GreasyTask::failed) {
-      rstfile << "# Warning: The following task failed!" << endl; 
+      rstfile << "# Warning: Task " << task->getTaskId() << " failed" << endl; 
       nindex++;
     }
     
     if (task->getTaskState() == GreasyTask::cancelled) {
-      rstfile << "# Warning: The following task was canceled due to a dependency failure!" << endl; 
+      rstfile << "# Warning: Task " << task->getTaskId() << " was cancelled due to a dependency failure" << endl; 
       nindex++;
     }
     
@@ -292,7 +292,7 @@ void GreasyEngine::baseWriteRestartFile() {
     if (task->hasDependencies()) {
       rstfile << "[# " << task->dumpDependencies() << " #] ";
     }
-    rstfile <<  ((*it).second)->getCommand() << endl;
+    rstfile << ((*it).second)->getCommand() << endl;
     
     //Update indexes of dependencies to the new lines in the restart
     dependants = revDepMap[task->getTaskId()];
