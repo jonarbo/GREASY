@@ -23,7 +23,7 @@ clean:
 	@rm -f *.o *.bak *~ *% core* 
 
 install: all
-        cp greasy $(PREFIX)/bin
+	cp greasy $(PREFIX)/bin
 
 # DO NOT DELETE
 

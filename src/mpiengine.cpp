@@ -35,8 +35,9 @@ bool MPIEngine::isWorker() {
 void MPIEngine::init() {
   
   //Dummy arguments for MPI::Init
-  int argc;
+  int argc=0;
   char **argv;
+  
   
   log->record(GreasyLog::devel, "MPIEngine::init", "Entering...");
   

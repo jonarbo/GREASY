@@ -1,8 +1,8 @@
 #!/bin/bash
 # @ job_name = greasy
 # @ initialdir = ./
-# @ output = greasy_%j.out
-# @ error  = greasy_%j.err
+# @ output = greasy-%j.out
+# @ error  = greasy-%j.err
 
 ##########################################################
 # Fill here with a number of cpus according to your needs
@@ -20,10 +20,9 @@ MACHINE=`echo $BSC_MACHINE | tr '[:lower:]' '[:upper:]'`
 if [ "$MACHINE" =  "UV100" ]; then
   MPIRUN=mnrun
 elif [ "$MACHINE" = "NVIDIA"  ]; then
-  MPIRUN=mnrun
+  MPIRUN=srun
 else 
-  echo "Machine $BSC_MACHINE not supported"
-  exit
+  MPIRUN=srun
 fi
 
 EXE=/gpfs/apps/$MACHINE/GREASY/2.0/bin/greasy
