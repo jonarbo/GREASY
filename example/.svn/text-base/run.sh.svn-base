@@ -1,0 +1,42 @@
+#!/bin/bash
+# @ job_name = greasy
+# @ initialdir = ./
+# @ output = greasy_%j.out
+# @ error  = greasy_%j.err
+# @ tracing = 1
+# @ x11=1
+
+##########################################################
+# Fill here with a number of cpus according to your needs
+##########################################################
+# @ total_tasks = 4
+# @ cpus_per_task = 4
+
+#########################################
+# and set an appropiate wall_clock_limit
+#########################################
+# @ wall_clock_limit = 00:60:00
+
+#debug
+EXE=/gpfs/apps/GREASY/test/greasy
+
+# production
+EXE=/gpfs/apps/GREASY/bin/greasydep
+
+###########################################
+# Here goes the path to the file where you 
+# have the list of tasks
+###########################################
+FILE=/gpfs/apps/GREASY/test/test.txt
+#FILE=/gpfs/apps/GREASY/test/test.test
+
+ulimit -c 100000
+
+export GREASY_LOG=.
+
+#srun /gpfs/apps/VALGRIND/3.5.0/bin/valgrind --leak-check=yes $EXE $FILE
+
+srun $EXE $FILE
+#/gpfs/apps/TOTALVIEW/totalview -mpi SLURM -np 4  $EXE -a $FILE
+
+

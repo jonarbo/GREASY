@@ -1,7 +1,8 @@
 ##### Variables
-SLURM   = 
-INCDIR = -I. 
-DEFINES = -DMPI_ENGINE
+PREFIX?=../
+SLURM   =
+INCDIR = -I.
+DEFINES = -DMPI_ENGINE -DSYSTEM_CFG="\"$(PREFIX)/etc/greasy.conf\""
 CXXFLAGS = -O2 -g $(INCDIR) $(DEFINES)
 LDFLAGS = 
 CXX = mpicxx
@@ -20,6 +21,9 @@ depend:
 
 clean:
 	@rm -f *.o *.bak *~ *% core* 
+
+install: all
+        cp greasy $(PREFIX)/bin
 
 # DO NOT DELETE
 

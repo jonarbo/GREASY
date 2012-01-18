@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 35
+/repos/greasy/!svn/ver/1/trunk/test
+END
+run.sh
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/repos/greasy/!svn/ver/1/trunk/test/run.sh
+END
+test.txt
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/repos/greasy/!svn/ver/1/trunk/test/test.txt
+END

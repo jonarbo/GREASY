@@ -1,0 +1,48 @@
+#!/bin/bash
+# @ job_name = greasy
+# @ initialdir = ./
+# @ output = greasy_%j.out
+# @ error  = greasy_%j.err
+
+##########################################################
+# Fill here with a number of cpus according to your needs
+# Keep in mind that one task is reserved for the master
+##########################################################
+# @ total_tasks = 4
+
+#########################################
+# and set an appropiate wall_clock_limit
+#########################################
+# @ wall_clock_limit = 01:10:00
+
+MACHINE=`echo $BSC_MACHINE | tr '[:lower:]' '[:upper:]'`
+
+if [ "$MACHINE" =  "UV100" ]; then
+  MPIRUN=mnrun
+elif [ "$MACHINE" = "NVIDIA"  ]; then
+  MPIRUN=mnrun
+else 
+  echo "Machine $BSC_MACHINE not supported"
+  exit
+fi
+
+EXE=/gpfs/apps/$MACHINE/GREASY/2.0/bin/greasy
+
+###########################################
+# Here goes the path to the file where you 
+# have the list of tasks
+###########################################
+FILE=short-example.txt
+
+
+###########################################
+# Here goes the path to the place where the 
+# logs will be written
+# By default, if not set, it will use:
+# ./greasy.log
+###########################################
+export GREASY_LOGFILE=greasy-$SLURM_JOBID.log
+
+$MPIRUN $EXE $FILE
+
+

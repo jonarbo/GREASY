@@ -6,8 +6,12 @@
 #include <csignal>
 #include <cstdlib>
 
+#ifndef SYSTEM_CFG
 #define SYSTEM_CFG "../etc/greasy.conf"
+#endif
+#ifndef USER_CFG
 #define USER_CFG "./greasy.conf"
+#endif
 
 using namespace std;
 
