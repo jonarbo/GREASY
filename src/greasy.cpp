@@ -1,7 +1,7 @@
 #include "greasylog.h"
 #include "greasyconfig.h"
 #include "greasyengine.h"
-
+/* Hello!! */
 #include <string>
 #include <csignal>
 #include <cstdlib>
