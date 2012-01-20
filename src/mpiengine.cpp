@@ -12,11 +12,10 @@ typedef struct {
 } reportStruct;
 
 
-MPIEngine::MPIEngine ( const string& filename) : GreasyEngine(filename){
+MPIEngine::MPIEngine ( const string& filename) : AbstractSchedulerEngine(filename){
   
   engineType="mpi";
   workerId = -1;
-  nworkers = 0;
   
 }
 
@@ -38,7 +37,6 @@ void MPIEngine::init() {
   int argc=0;
   char **argv;
   
-  
   log->record(GreasyLog::devel, "MPIEngine::init", "Entering...");
   
   MPI::Init(argc, argv);
@@ -50,13 +48,9 @@ void MPIEngine::init() {
   
   // Only the master has to perform the initialization of tasks.
   if (isMaster()) { 
-    baseInit();
-    // Fill the freeRank queue
-    for (int i=1;i<=nworkers; i++) {
-      freeWorkers.push(i);
-    }
-  }
-  if (isWorker()) {
+    AbstractSchedulerEngine::init();
+  } else {
+    
     // Disable signal handling for workers.
     // We only want to have the master in charge of the restarts and messages.
     signal(SIGTERM, SIG_DFL);
@@ -68,7 +62,6 @@ void MPIEngine::init() {
     
     //Worker at this point is ready.
     ready = true;
-    
   }
   
   log->record(GreasyLog::devel, "MPIEngine::init", "Exiting...");
@@ -76,11 +69,16 @@ void MPIEngine::init() {
 }
 
 void MPIEngine::finalize() {
+
+  if (isMaster()) { 
+    // At this point all tasks have finished and all nodes are free
+    // Let's fire the workers!
+    fireWorkers();
+    // The master has to do some cleanup.
+    AbstractSchedulerEngine::finalize();
+  }
   
   MPI::Finalize();
-  
-  // The master has to do some cleanup.
-  if (isMaster()) baseFinalize();
   
 }
 
@@ -110,61 +108,9 @@ void MPIEngine::run() {
 
 void MPIEngine::runMaster() {
   
-  //Master code
-  set<int>::iterator it;
-  GreasyTask* task = NULL;
-  
-  if (!isMaster()) return;
   log->record(GreasyLog::devel, "MPIEngine::runMaster", "Entering...");
   
-  // Dummy check: let's see if there is any worker...
-  if (nworkers==0) {
-    log->record(GreasyLog::error, "No workers found. Rerun greasy with more resources");    
-    return;
-  }
-  
-  globalTimer.start();
-
-  // Initialize the task queue with all the tasks ready to be executed
-  for (it=validTasks.begin();it!=validTasks.end(); it++) {
-    task = taskMap[*it];
-    if (task->isWaiting()) taskQueue.push(task);
-    else if (task->isBlocked()) blockedTasks.insert(task);
-  }
-   
-  // Main Scheduling loop
-  while (!(taskQueue.empty())||!(blockedTasks.empty())) {
-    while (!taskQueue.empty()) {
-      if (!freeWorkers.empty()) {
-	// There is room to allocate a task...
-	task =  taskQueue.front();
-	taskQueue.pop();
-	allocate(task);
-      } else {
-	// All workers are busy. We need to wait anyone to finish.
-	waitForAnyWorker();
-      }
-    }
-    
-    if (!(blockedTasks.empty())) {
-      // There are no tasks to be scheduled on the queue, but there are
-      // dependencies not fulfilled and tasks already running, so we have
-      // to wait for them to finish to release blocks on them.
-      waitForAnyWorker();
-    }
-  }
-
-  // At this point, all tasks are allocated / finished
-  // Wait for the last tasks to complete
-  while (freeWorkers.size()!=nworkers) {
-    waitForAnyWorker();
-  }
-  
-  // At this point all tasks have finished and all nodes are free
-  // Let's fire the workers!
-  fireWorkers();
-  
-  globalTimer.stop();
+  runScheduler();
   
   log->record(GreasyLog::devel, "MPIEngine::runMaster", "Exiting...");
   
@@ -172,7 +118,7 @@ void MPIEngine::runMaster() {
 
 void MPIEngine::writeRestartFile() {
  
-  if (isMaster()) baseWriteRestartFile();
+  if (isMaster()) AbstractSchedulerEngine::writeRestartFile();
   
 }
 
@@ -253,50 +199,6 @@ void MPIEngine::waitForAnyWorker() {
   }
   
   log->record(GreasyLog::devel, "MPIEngine::waitForAnyWorker", "Exiting...");
-  
-}
-
-void MPIEngine::updateDependencies(GreasyTask* parent) {
-  
-  int taskId, state;
-  GreasyTask* child;
-  list<int>::iterator it;
-
-  log->record(GreasyLog::devel, "MPIEngine::updateDependencies", "Entering...");
-  
-  taskId = parent->getTaskId();
-  state = parent->getTaskState();
-  log->record(GreasyLog::devel, "MPIEngine::updateDependencies", "Inspecting reverse deps for task " + toString(taskId));
-  
-  if ( revDepMap.find(taskId) == revDepMap.end() ){
-      log->record(GreasyLog::devel, "MPIEngine::updateDependencies", "The task "+ toString(taskId) + " does not have any other dependendant task. No update done.");
-      log->record(GreasyLog::devel, "MPIEngine::updateDependencies", "Exiting...");
-      return;
-  }
-
-  for(it=revDepMap[taskId].begin() ; it!=revDepMap[taskId].end();it++ ) {
-    child = taskMap[*it];
-    if (state == GreasyTask::completed) {
-      log->record(GreasyLog::devel, "MPIEngine::updateDependencies", "Remove dependency " + toString(taskId) + " from task " + toString(child->getTaskId()));
-      child->removeDependency(taskId);
-      if (!child->hasDependencies()) { 
-	log->record(GreasyLog::devel, "MPIEngine::updateDependencies", "Moving task from blocked set to the queue");
-	blockedTasks.erase(child);
-	taskQueue.push(child);
-      } else {
-	log->record(GreasyLog::devel, "MPIEngine::updateDependencies", "The task still has dependencies, so leave it blocked");
-      }
-    }
-    else if ((state == GreasyTask::failed)||(state == GreasyTask::cancelled)) {
-      log->record(GreasyLog::warning,  "Cancelling task " + toString(child->getTaskId()) + " because of task " + toString(taskId) + " failure");
-      log->record(GreasyLog::devel, "MPIEngine::updateDependencies", "Parent failed: cancelling task and removing it from blocked");
-      child->setTaskState(GreasyTask::cancelled);
-      blockedTasks.erase(child);
-      updateDependencies(child);
-    }
-  }
-  
-  log->record(GreasyLog::devel, "MPIEngine::updateDependencies", "Exiting...");
   
 }
 

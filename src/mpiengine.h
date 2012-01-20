@@ -5,13 +5,13 @@
 #include <queue>
 #include "mpi.h"
 
-#include "greasyengine.h"
+#include "abstractschedulerengine.h"
 
 /**
-  * This engine inherits GreasyEngine, and implements an MPI scheduler for Greasy.
+  * This engine inherits AbstractEngine, and implements an MPI scheduler for Greasy.
   * 
   */
-class MPIEngine : public GreasyEngine
+class MPIEngine : public AbstractSchedulerEngine
 {
   
 public:
@@ -25,23 +25,23 @@ public:
   /**
    * Perform the initialization of the engine and the MPI environment.
    */
-  void init();
+  virtual void init();
   
   /**
    * Execute the engine. It is divided into 2 different parts, for master and workers.
    */
-  void run();
+  virtual void run();
 
   /**
    * Finalization of the engine and MPI environment.
    */
-  void finalize();
+  virtual void finalize();
 
   /**
    * Reimplementation of writeRestartFile() to prevent workers from 
    * writing the restart (only the master does the job).
    */
-  void writeRestartFile();
+  virtual void writeRestartFile();
 
   /**
    * Reimplementation of dumpTasks() to prevent workers from 
@@ -74,25 +74,19 @@ protected:
    * Allocate a task in a free worker, sending the command to it.
    * @param task A pointer to a GreasyTask object to allocate.
    */
-  void allocate(GreasyTask* task);
+  virtual void allocate(GreasyTask* task);
   
   /**
    * Wait for any worker to complete their tasks and retrieve
    * results.
    */
-  void waitForAnyWorker();
+  virtual void waitForAnyWorker();
   
   /**
    * Send the end signal to the workers. This method should be called
    * when all tasks have been completed and we want to finalize workers.
    */
   void fireWorkers();
-  
-  /**
-   * Update all the tasks depending from the parent task which has finished.
-   * @param parent A pointer to a GreasyTask object that finished.
-   */
-  void updateDependencies(GreasyTask* parent);
   
   // Worker Methods
   /**
@@ -103,12 +97,6 @@ protected:
   void runWorker();
   
   int workerId; /**<  Id of the worker. Master is 0. */
-  map <int,int> taskAssignation; ///<  Map that holds the task assignation to workers.
-				 ///< workerId -> taskId
-  queue <int> freeWorkers; ///< The queue of free worker ids, from where the candidates
-			   ///< to run a task will be taken.
-  queue <GreasyTask*> taskQueue; ///< The queue of tasks to be executed.
-  set <GreasyTask*> blockedTasks; ///< The set of blocked tasks.
   char hostname[MPI_MAX_PROCESSOR_NAME]; ///< Cstring to hold the worker hostname.
 
 };

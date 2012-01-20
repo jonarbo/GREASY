@@ -27,11 +27,18 @@ install: all
 
 # DO NOT DELETE
 
-greasylog.o: greasylog.h greasyutils.h
-slurmengine.o: slurmengine.h greasyengine.h greasytask.h greasyconfig.h
-slurmengine.o: greasyutils.h greasylog.h
+greasylog.o: greasylog.h greasyutils.h greasytimer.h
+mpiengine.o: mpiengine.h abstractschedulerengine.h abstractengine.h greasyconfig.h
+mpiengine.o: greasyutils.h greasylog.h greasytimer.h greasytask.h
+greasy.o: greasylog.h greasyutils.h greasyconfig.h abstractengine.h
+greasy.o: greasytimer.h greasytask.h
+basicengine.o: abstractschedulerengine.h abstractengine.h greasyconfig.h greasyutils.h
+basicengine.o: greasylog.h greasytimer.h greasytask.h
+greasyregex.o: greasyregex.h greasyutils.h
+slurmengine.o: slurmengine.h abstractengine.h greasyconfig.h greasyutils.h
+slurmengine.o: greasylog.h greasytimer.h greasytask.h
+greasyengine.o: abstractengine.h greasyconfig.h greasyutils.h greasylog.h
+greasyengine.o: greasytimer.h greasytask.h greasyregex.h
 greasyconfig.o: greasyconfig.h greasyutils.h greasyregex.h
-mpiengine.o: mpiengine.h greasyengine.h greasytask.h greasyconfig.h
-mpiengine.o: greasyutils.h greasylog.h
-greasyengine.o: greasytask.h greasyconfig.h greasylog.h
-
+greasytimer.o: greasytimer.h
+greasytask.o: greasytask.h greasyutils.h greasyregex.h

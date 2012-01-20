@@ -1,5 +1,5 @@
-#ifndef GREASYENGINE_H
-#define GREASYENGINE_H
+#ifndef ABSTRACTENGINE_H
+#define ABSTRACTENGINE_H
 
 #include <string>
 #include <map>
@@ -14,13 +14,13 @@
 using namespace std;
 
 /**
-  * The GreasyEngine is the base abstract class of the main controller of the application.
+  * The AbstractEngine is the base abstract class of the main controller of the application.
   * It holds all the logic behind greasy. This class must be inherited by the specialized
   * class which will implement the low level stuff, like the scheduling of tasks.
   * Subclasses must implement init run and finalize methods.
-  * To construct objects, use GreasyEngineFactory.
+  * To construct objects, use AbstractEngineFactory.
   */
-class GreasyEngine
+class AbstractEngine
 {
 public:
 
@@ -28,7 +28,7 @@ public:
    * Constructor that adds the filename to process.
    * @param filename path to the task file
    */
-  GreasyEngine ( string filename );
+  AbstractEngine ( string filename );
 
   /**
    * It tells if the engine is ready to run or not. It will return false if the engine is not
@@ -38,10 +38,9 @@ public:
   bool isReady();
 
   /**
-   * Abstract method to be implemented in subclasses. It should provide all the initialization
-   * code. After init, engine should be prepared to run the tasks from the task file and detect
-   * possible problems after it. A baseInit() method is provided to initialize the basic parameters
-   * of the abstract engine, which MUST be called from the subclass.
+   * It provides all the initialization code. After init, engine should have parsed the task file and
+   * should be prepared to run the tasks and detect possible problems after it. If reimplemented, it 
+   * MUST be called from the subclass.
    */
   virtual void init() = 0;
   
@@ -54,15 +53,17 @@ public:
 
   /**
    * Abstract method to be implemented in subclasses. It should provide all the finalization
-   * and clean-up code of the engine. A baseFinalize() method is provided to do the basic cleanup
-   * of abstract engine, which MUST be called from the subclass.
+   * and clean-up code of the engine. An implementation is provided to do the basic cleanup
+   * of abstract engine, and MUST be called from the subclass if reimplemented.
    */
   virtual void finalize() = 0;
 
   /**
-   * Abstract method to be implemented in subclasses. It MUST call to the baseWriteRestartFile()
-   * method, which is actually the responsible for creating the restart file.
-   */
+   * Base method to write the restart file. It creates a file named taskFile.rst, and adds to it
+   * all the tasks that didn't complete successfully (they were waiting, running, failed or cancelled).
+   * It will also add invalid tasks, but commented out. All dependencies will be recorded along each task
+   * with the indexes updated to the new line numbering.
+   */  
   virtual void writeRestartFile() = 0;
 
   /**
@@ -73,17 +74,6 @@ public:
 
 protected:
   
-  /**
-   * Base method to perform initialization tasks, such as parse the task file and check everything 
-   * is correct before the engine runs. It should be called from the implemented init().
-   */
-  void baseInit();
-  
-  /**
-   * Base method to run finalization tasks, such as build the final summary or clean the taskMap.
-   * It should be called from the implemented finalize().
-   */
-  void baseFinalize();
   
   /**
    * It parses the task file and fills up the taskMap. It also checks if the task is syntactically
@@ -102,14 +92,6 @@ protected:
    * checking is enabled, will raise the fileErrors flag, preventing the engine from running.
    */   
   void recordInvalidTask(int taskId);
-
-  /**
-   * Base method to write the restart file. It creates a file named taskFile.rst, and adds to it
-   * all the tasks that didn't complete successfully (they were waiting, running, failed or cancelled).
-   * It will also add invalid tasks, but commented out. All dependencies will be recorded along each task
-   * with the indexes updated to the new line numbering.
-   */  
-  void baseWriteRestartFile();
   
   /**
    * It produces a final summary of the execution of greasy, with some statistics on the tasks completed,
@@ -146,20 +128,20 @@ private:
 };
 
 /**
- * Factory to build GreasyEngine objects.
+ * Factory to build AbstractEngine objects.
  */
-class GreasyEngineFactory {
+class AbstractEngineFactory {
 
 public:
   /**
-    * Get the required GreasyEngine instance according to the type specified.
+    * Get the required AbstractEngine instance according to the type specified.
     * @param filename The path to the task file 
     * @param type A string containing the type of the engine we want to build.
-    * @return A pointer to the GreasyEngine instance.
+    * @return A pointer to the AbstractEngine instance.
     */
-  static GreasyEngine* getGreasyEngineInstance(const string& filename, const string& type="");
+  static AbstractEngine* getAbstractEngineInstance(const string& filename, const string& type="");
 	
 };
 
 
-#endif // GREASYENGINE_H
+#endif // ABSTRACTENGINE_H

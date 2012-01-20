@@ -1,6 +1,6 @@
 #include "slurmengine.h"
 
-SlurmEngine::SlurmEngine (const string& filename ): GreasyEngine(filename) {
+SlurmEngine::SlurmEngine (const string& filename ): AbstractEngine(filename) {
   
   engineType="slurm";
   

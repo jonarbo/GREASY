@@ -1,6 +1,6 @@
 #include "greasylog.h"
 #include "greasyconfig.h"
-#include "greasyengine.h"
+#include "abstractengine.h"
 
 #include <string>
 #include <csignal>
@@ -15,7 +15,7 @@
 
 using namespace std;
 
-GreasyEngine* engine = NULL;
+AbstractEngine* engine = NULL;
 
 bool readConfig();
 void termHandler( int sig );
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
   signal(SIGINT, termHandler);
  
   // Create the proper engine selected and run it!
-  engine = GreasyEngineFactory::getGreasyEngineInstance(filename,config->getValue("GreasyEngine"));
+  engine = AbstractEngineFactory::getAbstractEngineInstance(filename,config->getValue("AbstractEngine"));
   if (!engine) {
       log->record(GreasyLog::error,"Greasy could not load the engine");
       return -1;

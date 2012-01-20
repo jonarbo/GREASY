@@ -1,4 +1,4 @@
-#include "greasyengine.h"
+#include "abstractengine.h"
 #include "greasyregex.h"
 
 #ifdef MPI_ENGINE 
@@ -12,7 +12,7 @@
 #include <cstdlib>
 #include <time.h>
 
-GreasyEngine* GreasyEngineFactory::getGreasyEngineInstance(const string& filename, const string& type) {
+AbstractEngine* AbstractEngineFactory::getAbstractEngineInstance(const string& filename, const string& type) {
 
   #ifdef MPI_ENGINE
   if (type == "mpi")
@@ -27,7 +27,7 @@ GreasyEngine* GreasyEngineFactory::getGreasyEngineInstance(const string& filenam
 
 }
 
-GreasyEngine::GreasyEngine ( string filename ) {
+AbstractEngine::AbstractEngine ( string filename ) {
   
   taskFile = filename;
   restartFile = filename + ".rst";
@@ -45,15 +45,15 @@ GreasyEngine::GreasyEngine ( string filename ) {
   
 }
 
-bool GreasyEngine::isReady() {
+bool AbstractEngine::isReady() {
  
   return ready;
   
 }
 
-void GreasyEngine::baseInit ( ) {
-   
-  log->record(GreasyLog::devel, "GreasyEngine::init", "Entering...");
+void AbstractEngine::init() {
+  
+  log->record(GreasyLog::devel, "AbstractEngine::init", "Entering...");
   
   log->record(GreasyLog::silent,"Start greasing " + getWorkingDir() + "/" + taskFile);
   parseTaskFile();
@@ -67,11 +67,13 @@ void GreasyEngine::baseInit ( ) {
     ready = true;
     log->record(GreasyLog::info,  "Engine " + toUpper(engineType) + " ready to run");  
   }
-  log->record(GreasyLog::devel, "GreasyEngine::init", "Exiting...");
+  log->record(GreasyLog::devel, "AbstractEngine::init", "Exiting...");
+  
 }
 
+void AbstractEngine::finalize() {
 
-void GreasyEngine::baseFinalize() {
+  log->record(GreasyLog::devel, "AbstractEngine::finalize", "Entering...");
   
   log->record(GreasyLog::info, "Engine " + toUpper(engineType) + " finished");  
   
@@ -86,11 +88,12 @@ void GreasyEngine::baseFinalize() {
   
   log->record(GreasyLog::silent,"Finished greasing " + getWorkingDir() + "/" + taskFile);
   
+  log->record(GreasyLog::devel, "AbstractEngine::finalize", "Exiting...");
 }
 
-void GreasyEngine::parseTaskFile() {
+void AbstractEngine::parseTaskFile() {
   
-  log->record(GreasyLog::devel, "GreasyEngine::parseTaskFile", "Entering...");
+  log->record(GreasyLog::devel, "AbstractEngine::parseTaskFile", "Entering...");
   ifstream myfile(taskFile.c_str());
   
   string blankLineP= "^([[:blank:]]*)$";
@@ -171,15 +174,15 @@ void GreasyEngine::parseTaskFile() {
     fileErrors=true;
   }
   
-  log->record(GreasyLog::devel, "GreasyEngine::parseTaskFile", "Exiting...");
+  log->record(GreasyLog::devel, "AbstractEngine::parseTaskFile", "Exiting...");
   
 }
 
-void GreasyEngine::checkDependencies() {
+void AbstractEngine::checkDependencies() {
   
   map<int,GreasyTask*>::iterator it;
  
-  log->record(GreasyLog::devel, "GreasyEngine::checkDependencies", "Entering...");
+  log->record(GreasyLog::devel, "AbstractEngine::checkDependencies", "Entering...");
   
   // For each task, check if its dependencies are valid and fill the reverse
   // dependency map.
@@ -216,11 +219,11 @@ void GreasyEngine::checkDependencies() {
     }
   }
   
-  log->record(GreasyLog::devel, "GreasyEngine::checkDependencies", "Exiting...");
+  log->record(GreasyLog::devel, "AbstractEngine::checkDependencies", "Exiting...");
   
 }
 
-void GreasyEngine::recordInvalidTask(int taskId) {
+void AbstractEngine::recordInvalidTask(int taskId) {
   
   if (strictChecking) {
     log->record(GreasyLog::error,  "Task " + toString(taskId) +
@@ -236,7 +239,7 @@ void GreasyEngine::recordInvalidTask(int taskId) {
   
 }
 
-void GreasyEngine::baseWriteRestartFile() {
+void AbstractEngine::writeRestartFile() {
  
   GreasyTask *task;
   map<int,GreasyTask*>::iterator it;
@@ -248,7 +251,7 @@ void GreasyEngine::baseWriteRestartFile() {
   ofstream rstfile( restartFile.c_str(), ios_base::out);
 
   
-  log->record(GreasyLog::devel, "GreasyEngine::writeRestartFile", "Entering...");
+  log->record(GreasyLog::devel, "AbstractEngine::writeRestartFile", "Entering...");
 
   if (!rstfile.is_open()) {
       log->record(GreasyLog::error,  "Could not create restart file " + restartFile);
@@ -330,11 +333,11 @@ void GreasyEngine::baseWriteRestartFile() {
   rstfile.close();
   log->record(GreasyLog::info, "Restart file created");
   
-  log->record(GreasyLog::devel, "GreasyEngine::writeRestartFile", "Exiting...");
+  log->record(GreasyLog::devel, "AbstractEngine::writeRestartFile", "Exiting...");
   
 }
 
-void GreasyEngine::buildFinalSummary() {
+void AbstractEngine::buildFinalSummary() {
   
   int completed = 0;
   int failed = 0;
@@ -346,7 +349,7 @@ void GreasyEngine::buildFinalSummary() {
   unsigned long usedTime = 0;
   float rup = 0;
 
-  log->record(GreasyLog::devel, "GreasyEngine::buildFinalSummary", "Entering...");
+  log->record(GreasyLog::devel, "AbstractEngine::buildFinalSummary", "Entering...");
   // Compute final stats
   for (it=taskMap.begin();it!=taskMap.end(); it++) {
     task = it->second;
@@ -382,13 +385,13 @@ void GreasyEngine::buildFinalSummary() {
   // Write a restart if we find not completed tasks
   if (failed + cancelled + invalid > 0) writeRestartFile();
   
-  log->record(GreasyLog::devel, "GreasyEngine::buildFinalSummary", "Exiting...");
+  log->record(GreasyLog::devel, "AbstractEngine::buildFinalSummary", "Exiting...");
   
 }
 
-string GreasyEngine::dumpTaskMap() {
+string AbstractEngine::dumpTaskMap() {
   
-  log->record(GreasyLog::devel, "GreasyEngine::dumpTasks", "Entering...");
+  log->record(GreasyLog::devel, "AbstractEngine::dumpTasks", "Entering...");
   map<int,GreasyTask*>::iterator it;
   string s = "\nList of tasks:\n===============\n";
 
@@ -397,7 +400,14 @@ string GreasyEngine::dumpTaskMap() {
   }
   s+="\n";
   
-  log->record(GreasyLog::devel, "GreasyEngine::dumpTasks", "Exiting...");
+  log->record(GreasyLog::devel, "AbstractEngine::dumpTasks", "Exiting...");
   return s;
 }
+
+void AbstractEngine::dumpTasks() {
+  
+   log->record(GreasyLog::devel, dumpTaskMap());
+   
+}
+
 

@@ -3,13 +3,13 @@
 
 #include <string>
 
-#include "greasyengine.h"
+#include "abstractengine.h"
 
 /**
   * class SlurmEngine
   * 
   */
-class SlurmEngine : public GreasyEngine
+class SlurmEngine : public AbstractEngine
 {
   
 public:
