@@ -26,6 +26,26 @@ public:
    * reimplementation of the init() method adding the workers init code.
    */
   virtual void init();
+    /**
+   * Abstract method to be implemented in subclasses. It should provide all the finalization
+   * and clean-up code of the engine. An implementation is provided to do the basic cleanup
+   * of abstract engine, and MUST be called from the subclass if reimplemented.
+   */
+  virtual void finalize();
+
+  /**
+   * Base method to write the restart file. It creates a file named taskFile.rst, and adds to it
+   * all the tasks that didn't complete successfully (they were waiting, running, failed or cancelled).
+   * It will also add invalid tasks, but commented out. All dependencies will be recorded along each task
+   * with the indexes updated to the new line numbering.
+   */  
+  virtual void writeRestartFile();
+
+  /**
+   * Abstract method to be implemented in subclasses. It should print the contents of the taskMap,
+   * calling dumpTaskMap(). This method is only for debugging purposes
+   */
+  virtual void dumpTasks();
 
 protected:
   
@@ -56,6 +76,11 @@ protected:
    * Get default number of workers according to the cpus available in the computer.
    */
   virtual void getDefaultNWorkers();
+  
+  /**
+   * All the checks after a task finishes are done here, updating task and engine metadata.
+   */  
+  virtual void taskEpilogue(GreasyTask *task);
   
   
   map <int,int> taskAssignation; ///<  Map that holds the task assignation to workers.

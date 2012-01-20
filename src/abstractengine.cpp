@@ -1,6 +1,7 @@
 #include "abstractengine.h"
 #include "greasyregex.h"
 
+#include "basicengine.h"
 #ifdef MPI_ENGINE 
 #include "mpiengine.h"
 #endif
@@ -15,15 +16,17 @@
 AbstractEngine* AbstractEngineFactory::getAbstractEngineInstance(const string& filename, const string& type) {
 
   #ifdef MPI_ENGINE
-  if (type == "mpi")
-	  return new MPIEngine(filename);
+  if (type == "mpi") return new MPIEngine(filename);
   #endif
+  
   #ifdef SLURM_ENGINE
-  if (type == "slurm")
-	  return new SlurmEngine(filename);
+  if (type == "slurm") return new SlurmEngine(filename);
   #endif
-  // No Engine supported
-  return NULL;
+  
+  if (type == "basic") return new BasicEngine(filename);
+
+  // Basic Engine is the fallback
+  return new BasicEngine(filename);
 
 }
 

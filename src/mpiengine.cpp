@@ -152,51 +152,28 @@ void MPIEngine::waitForAnyWorker() {
   
   int retcode;
   int worker;
-  int maxRetries=0;
   GreasyTask* task = NULL;
   MPI::Status status;
   reportStruct report; 
   
   log->record(GreasyLog::devel, "MPIEngine::waitForAnyWorker", "Entering...");
   
-  if (config->keyExists("MaxRetries")) fromString(maxRetries, config->getValue("MaxRetries"));
-  
   log->record(GreasyLog::debug,  "Waiting for any task to complete...");
   MPI::COMM_WORLD.Recv ( &report, sizeof(reportStruct), MPI::CHAR, MPI::ANY_SOURCE, MPI::ANY_TAG, status );
-  retcode = report.retcode;
   
+  retcode = report.retcode;
   worker = status.Get_source ();
   task = taskMap[taskAssignation[worker]];
+    
+  // Push worker to the free workers queue again
+  freeWorkers.push(worker);
   
   // Update task info with the report
   task->setElapsedTime(report.elapsed);
   task->setReturnCode(report.retcode);
   task->setHostname(string(report.hostname));
-  
-  // Push worker to the free workers queue again
-  freeWorkers.push(worker);
-  
-  if (report.retcode != 0) {
-    log->record(GreasyLog::error,  "Task " + toString(task->getTaskId()) + 
-		    " failed with exit code " + toString(report.retcode) + " on node " + 
-		    task->getHostname() +". Elapsed: " + GreasyTimer::secsToTime(report.elapsed));
-    // Task failed, let's retry if we need to
-    if ((maxRetries > 0) && (task->getRetries() < maxRetries)) {
-      log->record(GreasyLog::warning,  "Retry "+ toString(task->getRetries()) + 
-		    "/" + toString(maxRetries) + " of task " + toString(task->getTaskId()));
-      task->addRetryAttempt();
-      allocate(task);
-    } else {
-      task->setTaskState(GreasyTask::failed);
-      updateDependencies(task);
-    }
-  } else {
-    log->record(GreasyLog::info,  "Task " + toString(task->getTaskId()) + 
-		    " completed successfully on node " + task->getHostname() + ". Elapsed: " + 
-		    GreasyTimer::secsToTime(report.elapsed));
-    task->setTaskState(GreasyTask::completed);
-    updateDependencies(task);
-  }
+
+  taskEpilogue(task);
   
   log->record(GreasyLog::devel, "MPIEngine::waitForAnyWorker", "Exiting...");
   

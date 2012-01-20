@@ -2,21 +2,16 @@
 #include <csignal>
 #include <cstdlib>
 #include <cstring>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
+
 
 AbstractSchedulerEngine::AbstractSchedulerEngine ( const string& filename) : AbstractEngine(filename){
   
-  engineType="basic";
-
   // Set the number of workers
   if (config->keyExists("NWorkers")) 
     nworkers = fromString(nworkers, config->getValue("NWorkers"));
   else getDefaultNWorkers();
   
 }
-
 
 void AbstractSchedulerEngine::init() {
     
@@ -30,6 +25,24 @@ void AbstractSchedulerEngine::init() {
   }
   
   log->record(GreasyLog::devel, "AbstractSchedulerEngine::init", "Exiting...");
+  
+}
+
+void AbstractSchedulerEngine::finalize() {
+
+  AbstractEngine::finalize();
+  
+}
+
+void AbstractSchedulerEngine::writeRestartFile() {
+
+  AbstractEngine::writeRestartFile();
+  
+}
+
+void AbstractSchedulerEngine::dumpTasks() {
+
+  AbstractEngine::dumpTasks();
   
 }
 
@@ -90,103 +103,6 @@ void AbstractSchedulerEngine::runScheduler() {
   
 }
 
-void AbstractSchedulerEngine::allocate(GreasyTask* task) {
-  
-  int worker, cmdSize;
-  const char *cmd;
-  
-  log->record(GreasyLog::devel, "AbstractSchedulerEngine::allocate", "Entering...");
- /*    
-  worker = freeWorkers.front();
-  freeWorkers.pop();
-  
-  log->record(GreasyLog::info,  "Allocating task " + toString(task->getTaskId()));
-  
-  log->record(GreasyLog::debug, "AbstractSchedulerEngine::allocate", "Sending task " + toString(task->getTaskId()) + " to worker " + toString(worker));
-  taskAssignation[worker] = task->getTaskId();
-
-  task->setTaskState(GreasyTask::running);
-  
-  // Send the command size and the actual command
-  cmdSize = task->getCommand().size()+1;
-  cmd = task->getCommand().c_str();
-  
-
-  pid_t pid = fork();
-  
-  if (pid == 0) {
-   //Child process will exec command...
-   // We use system instead of exec because of greater compatibility with command to be executed
-   exit(system(cmd));  
-  } else if (pid > 0) {
-    // parent
-    pidToWorker[pid] = worker;
-  } else {
-   //error 
-   log->record(GreasyLog::error,  "Could not execute a new process");
-   freeWorkers.push(worker);
-  }
-    */
- 
-  log->record(GreasyLog::devel, "AbstractSchedulerEngine::allocate", "Exiting...");
-  
-}
-
-void AbstractSchedulerEngine::waitForAnyWorker() {
-  
-  int retcode = -1;
-  int worker;
-  pid_t pid;
-  int status;
-  int maxRetries=0;
-  GreasyTask* task = NULL;
-  
-  log->record(GreasyLog::devel, "AbstractSchedulerEngine::waitForAnyWorker", "Entering...");
-/*  
-  if (config->keyExists("MaxRetries")) fromString(maxRetries, config->getValue("MaxRetries"));
-  
-  log->record(GreasyLog::debug,  "Waiting for any task to complete...");
-  pid = wait(&status);
-
-  // Get the return code
-  if (WIFEXITED(status)) retcode = WEXITSTATUS(status);
-
-  worker = pidToWorker[pid];
-  task = taskMap[taskAssignation[worker]];
-  
-  // Update task info with the report
-  task->setElapsedTime(report.elapsed);
-  task->setReturnCode(report.retcode);
-  task->setHostname(string(report.hostname));
-  
-  // Push worker to the free workers queue again
-  freeWorkers.push(worker);
-  
-  if (report.retcode != 0) {
-    log->record(GreasyLog::error,  "Task " + toString(task->getTaskId()) + 
-		    " failed with exit code " + toString(report.retcode) + " on node " + 
-		    task->getHostname() +". Elapsed: " + GreasyTimer::secsToTime(report.elapsed));
-    // Task failed, let's retry if we need to
-    if ((maxRetries > 0) && (task->getRetries() < maxRetries)) {
-      log->record(GreasyLog::warning,  "Retry "+ toString(task->getRetries()) + 
-		    "/" + toString(maxRetries) + " of task " + toString(task->getTaskId()));
-      task->addRetryAttempt();
-      allocate(task);
-    } else {
-      task->setTaskState(GreasyTask::failed);
-      updateDependencies(task);
-    }
-  } else {
-    log->record(GreasyLog::info,  "Task " + toString(task->getTaskId()) + 
-		    " completed successfully on node " + task->getHostname() + ". Elapsed: " + 
-		    GreasyTimer::secsToTime(report.elapsed));
-    task->setTaskState(GreasyTask::completed);
-    updateDependencies(task);
-  }*/
-  
-  log->record(GreasyLog::devel, "AbstractSchedulerEngine::waitForAnyWorker", "Exiting...");
-  
-}
 
 void AbstractSchedulerEngine::updateDependencies(GreasyTask* parent) {
   
@@ -232,8 +148,43 @@ void AbstractSchedulerEngine::updateDependencies(GreasyTask* parent) {
   
 }
 
+void AbstractSchedulerEngine::taskEpilogue(GreasyTask *task) {
+  
+  int maxRetries=0;
+
+  log->record(GreasyLog::devel, "AbstractSchedulerEngine::taskEpilogue", "Entering...");
+  
+  if (config->keyExists("MaxRetries")) fromString(maxRetries, config->getValue("MaxRetries"));
+      
+  if (task->getReturnCode() != 0) {
+    log->record(GreasyLog::error,  "Task " + toString(task->getTaskId()) + 
+		    " failed with exit code " + toString(task->getReturnCode()) + " on node " + 
+		    task->getHostname() +". Elapsed: " + GreasyTimer::secsToTime(task->getElapsedTime()));
+    // Task failed, let's retry if we need to
+    if ((maxRetries > 0) && (task->getRetries() < maxRetries)) {
+      log->record(GreasyLog::warning,  "Retry "+ toString(task->getRetries()) + 
+		    "/" + toString(maxRetries) + " of task " + toString(task->getTaskId()));
+      task->addRetryAttempt();
+      allocate(task);
+    } else {
+      task->setTaskState(GreasyTask::failed);
+      updateDependencies(task);
+    }
+  } else {
+    log->record(GreasyLog::info,  "Task " + toString(task->getTaskId()) + 
+		    " completed successfully on node " + task->getHostname() + ". Elapsed: " + 
+		    GreasyTimer::secsToTime(task->getElapsedTime()));
+    task->setTaskState(GreasyTask::completed);
+    updateDependencies(task);
+  }
+  
+  log->record(GreasyLog::devel, "AbstractSchedulerEngine::taskEpilogue", "Exiting...");
+  
+}
+
 void AbstractSchedulerEngine::getDefaultNWorkers() {
  
   nworkers = sysconf(_SC_NPROCESSORS_ONLN);
+  log->record(GreasyLog::devel, "AbstractSchedulerEngine::getDefaultNWorkers", "Default nworkers: " + toString(nworkers));
   
 }
