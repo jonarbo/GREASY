@@ -147,7 +147,7 @@ public:
     * @param type A string containing the type of the engine we want to build.
     * @return A pointer to the AbstractEngine instance.
     */
-  static AbstractEngine* getAbstractEngineInstance(const string& filename, const string& type , GreasyLog* log );
+    static AbstractEngine* getAbstractEngineInstance(const string& filename, const string& type="" );
 	
 };
 

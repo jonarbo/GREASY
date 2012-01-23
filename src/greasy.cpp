@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
   signal(SIGINT, termHandler);
  
   // Create the proper engine selected and run it!
-  engine = AbstractEngineFactory::getAbstractEngineInstance(filename,config->getValue("Engine"),log);
+  engine = AbstractEngineFactory::getAbstractEngineInstance(filename,config->getValue("Engine"));
   if (!engine) {
       log->record(GreasyLog::error,"Greasy could not load the engine");
       return -1;

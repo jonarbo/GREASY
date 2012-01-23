@@ -1,13 +1,16 @@
 #include "abstractengine.h"
 #include "greasyregex.h"
+#include "basicengine.h"
 
 #ifdef MPI_ENGINE
     #include "mpiengine.h"
-#elif defined  SLURM_ENGINE
+#endif
+
+#ifdef SLURM_ENGINE
     #include "slurmengine.h"
-#elif defined BASIC_ENGINE
-    #include "basicengine.h"
-#elif defined THREAD_ENGINE
+#endif
+
+#ifdef THREAD_ENGINE
     #include "threadengine.h"
 #endif
 
@@ -15,36 +18,24 @@
 #include <cstdlib>
 #include <time.h>
 
-AbstractEngine* AbstractEngineFactory::getAbstractEngineInstance(const string& filename, const string& type, GreasyLog* log ) {
+AbstractEngine* AbstractEngineFactory::getAbstractEngineInstance(const string& filename, const string& type ) {
+
+  if (type == "basic" || type.empty() )
+      return new BasicEngine(filename);
 
   #ifdef MPI_ENGINE
   if (type == "mpi")
       return new MPIEngine(filename);
-  else
-      log->record(GreasyLog::error, "Wrong engine type!!! This version only supports MPI scheduler");
-  return NULL;
   #endif
-  
+
   #ifdef SLURM_ENGINE
   if (type == "slurm")
       return new SlurmEngine(filename);
-  else
-      log->record(GreasyLog::error, "Wrong engine type!!! This version only supports SLURM scheduler");
-  return NULL;
-  #endif
-  
-  #ifdef BASIC_ENGINE
-  if (type == "basic")
-      return new BasicEngine(filename);
-  else
-      log->record(GreasyLog::error, "Wrong engine type!!! This version only supports the basic(fork) scheduler");
-  return NULL;
   #endif
 
-  /* JORGE: Mejor que no haya fallback ... */
-  // Basic Engine is the fallback
-  // return new BasicEngine(filename);
+  GreasyLog::getInstance()->record(GreasyLog::error, "Wrong engine type requested!!! This version does not supports '" + type + "' scheduler");
 
+  return NULL;
 }
 
 AbstractEngine::AbstractEngine ( string filename ) {
