@@ -15,13 +15,13 @@
 #include <cstdlib>
 #include <time.h>
 
-AbstractEngine* AbstractEngineFactory::getAbstractEngineInstance(const string& filename, const string& type, const GreasyLog* log) {
+AbstractEngine* AbstractEngineFactory::getAbstractEngineInstance(const string& filename, const string& type, GreasyLog* log ) {
 
   #ifdef MPI_ENGINE
   if (type == "mpi")
       return new MPIEngine(filename);
   else
-      log->record(GreasyLog::error, "Wrong engine type!!! This version only supports MPI scheduler",);
+      log->record(GreasyLog::error, "Wrong engine type!!! This version only supports MPI scheduler");
   return NULL;
   #endif
   
@@ -29,7 +29,7 @@ AbstractEngine* AbstractEngineFactory::getAbstractEngineInstance(const string& f
   if (type == "slurm")
       return new SlurmEngine(filename);
   else
-      log->record(GreasyLog::error, "Wrong engine type!!! This version only supports SLURM scheduler",);
+      log->record(GreasyLog::error, "Wrong engine type!!! This version only supports SLURM scheduler");
   return NULL;
   #endif
   
@@ -37,7 +37,7 @@ AbstractEngine* AbstractEngineFactory::getAbstractEngineInstance(const string& f
   if (type == "basic")
       return new BasicEngine(filename);
   else
-      log->record(GreasyLog::error, "Wrong engine type!!! This version only supports the basic(fork) scheduler",);
+      log->record(GreasyLog::error, "Wrong engine type!!! This version only supports the basic(fork) scheduler");
   return NULL;
   #endif
 
