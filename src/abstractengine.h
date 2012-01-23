@@ -42,7 +42,9 @@ public:
    * should be prepared to run the tasks and detect possible problems after it. If reimplemented, it 
    * MUST be called from the subclass.
    */
-  virtual void init() = 0;
+  /*JORGE: Esta funcion ya no es pura virtual ... esta implementado */
+  // virtual void init() = 0;
+  virtual void init() ;
   
   /**
    * Abstract method to be implemented in subclasses. It should provide all the scheduling
@@ -52,11 +54,13 @@ public:
   virtual void run() = 0;
 
   /**
-   * Abstract method to be implemented in subclasses. It should provide all the finalization
-   * and clean-up code of the engine. An implementation is provided to do the basic cleanup
+   * Method that should provide all the finalization and clean-up code of the engine.
+   * An implementation is provided to do the basic cleanup
    * of abstract engine, and MUST be called from the subclass if reimplemented.
    */
-  virtual void finalize() = 0;
+  /*JORGE: Esta funcion ya no es pura virtual ... esta implementado */
+  // virtual void finalize() = 0;
+  virtual void finalize() ;
 
   /**
    * Base method to write the restart file. It creates a file named taskFile.rst, and adds to it
@@ -64,13 +68,17 @@ public:
    * It will also add invalid tasks, but commented out. All dependencies will be recorded along each task
    * with the indexes updated to the new line numbering.
    */  
-  virtual void writeRestartFile() = 0;
+  /*JORGE: Esta funcion ya no es pura virtual ... esta implementado */
+  // virtual void writeRestartFile() = 0;
+  virtual void writeRestartFile();
 
   /**
-   * Abstract method to be implemented in subclasses. It should print the contents of the taskMap,
+   * Method that should print the contents of the taskMap,
    * calling dumpTaskMap(). This method is only for debugging purposes
    */
-  virtual void dumpTasks() = 0;
+   /*JORGE: Esta funcion ya no es pura virtual ... esta implementado */
+   // virtual void dumpTasks() = 0;
+   virtual void dumpTasks();
 
 protected:
   
@@ -139,7 +147,7 @@ public:
     * @param type A string containing the type of the engine we want to build.
     * @return A pointer to the AbstractEngine instance.
     */
-  static AbstractEngine* getAbstractEngineInstance(const string& filename, const string& type="");
+  static AbstractEngine* getAbstractEngineInstance(const string& filename, const string& type="", const GreasyLog *log );
 	
 };
 

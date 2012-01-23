@@ -8,7 +8,7 @@
 #include "abstractschedulerengine.h"
 
 /**
-  * This engine inherits AbstractEngine, and implements an MPI scheduler for Greasy.
+  * This engine inherits AbstractSchedulerEngine, and implements an MPI scheduler for Greasy.
   * 
   */
 class MPIEngine : public AbstractSchedulerEngine

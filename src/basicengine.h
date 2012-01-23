@@ -9,8 +9,8 @@
 #include "abstractschedulerengine.h"
 
 /**
-  * This engine inherits AbstractEngine, and implements an basic scheduler and launcher
-  * for Greasy in a single machine.
+  * This engine inherits AbstractSchedulerEngine, and implements a basic scheduler and launcher
+  * for Greasy in a single machine using system fork.
   */
 class BasicEngine : public AbstractSchedulerEngine
 {
