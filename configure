@@ -5513,7 +5513,7 @@ fi
 
 #AC_DEFINE(SYSTEM_CFG, , System Config file)
 
-ac_config_files="$ac_config_files Makefile src/Makefile etc/Makefile etc/greasy.conf doc/Makefile example/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile etc/Makefile etc/greasy.conf doc/Makefile example/Makefile bin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -6272,6 +6272,7 @@ do
     "etc/greasy.conf") CONFIG_FILES="$CONFIG_FILES etc/greasy.conf" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "example/Makefile") CONFIG_FILES="$CONFIG_FILES example/Makefile" ;;
+    "bin/Makefile") CONFIG_FILES="$CONFIG_FILES bin/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

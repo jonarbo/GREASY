@@ -77,4 +77,4 @@ AM_CONDITIONAL(THREAD_ENGINE, test x$thread_engine = xyes)
 
 #AC_DEFINE(SYSTEM_CFG, , System Config file)
 
-AC_OUTPUT(Makefile src/Makefile etc/Makefile etc/greasy.conf doc/Makefile example/Makefile)
+AC_OUTPUT(Makefile src/Makefile etc/Makefile etc/greasy.conf doc/Makefile example/Makefile bin/Makefile)

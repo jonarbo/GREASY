@@ -1,3 +1,3 @@
 #!/bin/bash
 
-aclocal && automake && autoconf
+aclocal && automake -ac && autoconf
