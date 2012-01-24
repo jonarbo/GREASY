@@ -35,8 +35,6 @@ void BasicEngine::allocate(GreasyTask* task) {
   freeWorkers.pop();
   taskAssignation[worker] = task->getTaskId();
   
-  log->record(GreasyLog::debug, "BasicEngine::allocate", "Sending task " + toString(task->getTaskId()) + " to worker " + toString(worker));
-  
   pid_t pid = fork();
   
   if (pid == 0) {
@@ -45,6 +43,9 @@ void BasicEngine::allocate(GreasyTask* task) {
    exit(system(task->getCommand().c_str()));  
   } else if (pid > 0) {
     // parent
+    log->record(GreasyLog::debug,  "BasicEngine::allocate", "Task " 
+		      + toString(task->getTaskId()) + " to worker " + toString(worker)
+		      + " with PID " + toString(pid));
     pidToWorker[pid] = worker;
     task->setTaskState(GreasyTask::running);
     workerTimers[worker].reset();

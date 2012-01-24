@@ -1,6 +1,7 @@
 #include "greasylog.h"
 #include "greasyconfig.h"
 #include "abstractengine.h"
+#include "config.h"
 
 #include <string>
 #include <csignal>

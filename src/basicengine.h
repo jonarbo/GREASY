@@ -44,7 +44,7 @@ protected:
   virtual void waitForAnyWorker();
   
   map<pid_t,int> pidToWorker; /**<  Map to translate a pid to the corresponding worker. */
-  GreasyTimer workerTimers[]; /**<  Array of worker timers to know elapsed time of tasks. */
+  map<int, GreasyTimer> workerTimers; /**<  Map of worker timers to know elapsed time of tasks. */
   char hostname[HOST_NAME_MAX]; ///< Cstring to hold the worker hostname.
 };
 

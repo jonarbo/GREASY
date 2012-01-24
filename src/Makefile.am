@@ -5,10 +5,13 @@ greasy_SOURCES = abstractengine.cpp abstractengine.h abstractschedulerengine.cpp
 
 if MPI_ENGINE
 greasy_SOURCES += mpiengine.cpp mpiengine.h
+AM_CPPFLAGS += -DMPI_ENGINE
 endif
 if SLURM_ENGINE
 greasy_SOURCES += slurmengine.cpp slurmengine.h 
+AM_CPPFLAGS += -DSLURM_ENGINE
 endif
 if THREAD_ENGINE
 greasy_SOURCES += threadengine.cpp threadengine.h 
+AM_CPPFLAGS += -DTHREAD_ENGINE
 endif

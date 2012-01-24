@@ -34,8 +34,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 bin_PROGRAMS = greasy$(EXEEXT)
 @MPI_ENGINE_TRUE@am__append_1 = mpiengine.cpp mpiengine.h
-@SLURM_ENGINE_TRUE@am__append_2 = slurmengine.cpp slurmengine.h 
-@THREAD_ENGINE_TRUE@am__append_3 = threadengine.cpp threadengine.h 
+@MPI_ENGINE_TRUE@am__append_2 = -DMPI_ENGINE
+@SLURM_ENGINE_TRUE@am__append_3 = slurmengine.cpp slurmengine.h 
+@SLURM_ENGINE_TRUE@am__append_4 = -DSLURM_ENGINE
+@THREAD_ENGINE_TRUE@am__append_5 = threadengine.cpp threadengine.h 
+@THREAD_ENGINE_TRUE@am__append_6 = -DTHREAD_ENGINE
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -176,14 +179,15 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CPPFLAGS = -DSYSTEM_CFG=\"@sysconfdir@/greasy.conf\"
+AM_CPPFLAGS = -DSYSTEM_CFG=\"@sysconfdir@/greasy.conf\" \
+	$(am__append_2) $(am__append_4) $(am__append_6)
 greasy_SOURCES = abstractengine.cpp abstractengine.h \
 	abstractschedulerengine.cpp abstractschedulerengine.h \
 	basicengine.cpp basicengine.h greasyconfig.cpp greasyconfig.h \
 	greasy.cpp greasylog.cpp greasylog.h greasyregex.cpp \
 	greasyregex.h greasytask.cpp greasytask.h greasytimer.cpp \
-	greasytimer.h greasyutils.h $(am__append_1) $(am__append_2) \
-	$(am__append_3)
+	greasytimer.h greasyutils.h $(am__append_1) $(am__append_3) \
+	$(am__append_5)
 all: all-am
 
 .SUFFIXES:
