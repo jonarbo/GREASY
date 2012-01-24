@@ -7,30 +7,12 @@ AM_INIT_AUTOMAKE(greasy,2.0)
 AC_CONFIG_SRCDIR([src/greasylog.h])
 AC_CONFIG_HEADERS([config.h])
 
-# Checks for programs.
-AC_PROG_CXX
-AC_PROG_CC
-
-# Checks for libraries.
-
-# Checks for header files.
-AC_CHECK_HEADERS([limits.h sys/time.h unistd.h])
-
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_STDBOOL
-AC_C_INLINE
-AC_TYPE_PID_T
-AC_TYPE_SIZE_T
-
-# Checks for library functions.
-AC_FUNC_FORK
-AC_FUNC_MALLOC
-AC_CHECK_FUNCS([getcwd gethostname gettimeofday regcomp])
-
 AC_SUBST(greasy_engine,[basic])
 
-# Checks for command line options
+# Checks for programs.
+AC_PROG_CC
+
+# Check for mpi
 AC_ARG_ENABLE(mpi-engine,
   [  --enable-mpi-engine    enable MPI engine (default=no)],
   [mpi_engine=${enableval}],
@@ -52,8 +34,30 @@ if test x$mpi_engine = xyes; then
   else
     CXX=mpicxx
   fi
+  AC_PROG_CXX
   AC_SUBST(greasy_engine,[mpi])
+else
+  AC_PROG_CXX
 fi
+
+# Checks for libraries.
+
+# Checks for header files.
+AC_CHECK_HEADERS([limits.h sys/time.h unistd.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_STDBOOL
+AC_C_INLINE
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+
+# Checks for library functions.
+AC_FUNC_FORK
+AC_FUNC_MALLOC
+AC_CHECK_FUNCS([getcwd gethostname gettimeofday regcomp])
+
+# Checks for other command line options
+
 
 AC_ARG_ENABLE(slurm-engine,
   [  --enable-slurm-engine    enable SLURM engine (not implemented yet)],
