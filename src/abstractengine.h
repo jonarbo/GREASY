@@ -42,8 +42,6 @@ public:
    * should be prepared to run the tasks and detect possible problems after it. If reimplemented, it 
    * MUST be called from the subclass.
    */
-  /*JORGE: Esta funcion ya no es pura virtual ... esta implementado */
-  // virtual void init() = 0;
   virtual void init() ;
   
   /**
@@ -54,35 +52,34 @@ public:
   virtual void run() = 0;
 
   /**
+   * Abstract method to get default number of workers according to the current configuration.
+   */
+  virtual void getDefaultNWorkers() = 0;
+
+  /**
    * Method that should provide all the finalization and clean-up code of the engine.
    * An implementation is provided to do the basic cleanup
    * of abstract engine, and MUST be called from the subclass if reimplemented.
    */
-  /*JORGE: Esta funcion ya no es pura virtual ... esta implementado */
-  // virtual void finalize() = 0;
   virtual void finalize() ;
+
+  /**
+   * Method that should print the contents of the taskMap,
+   * calling dumpTaskMap(). This method is only for debugging purposes
+   */
+   virtual void dumpTasks();
 
   /**
    * Base method to write the restart file. It creates a file named taskFile.rst, and adds to it
    * all the tasks that didn't complete successfully (they were waiting, running, failed or cancelled).
    * It will also add invalid tasks, but commented out. All dependencies will be recorded along each task
    * with the indexes updated to the new line numbering.
-   */  
-  /*JORGE: Esta funcion ya no es pura virtual ... esta implementado */
-  // virtual void writeRestartFile() = 0;
-  virtual void writeRestartFile();
-
-  /**
-   * Method that should print the contents of the taskMap,
-   * calling dumpTaskMap(). This method is only for debugging purposes
    */
-   /*JORGE: Esta funcion ya no es pura virtual ... esta implementado */
-   // virtual void dumpTasks() = 0;
-   virtual void dumpTasks();
+   virtual void writeRestartFile();
+
 
 protected:
-  
-  
+
   /**
    * It parses the task file and fills up the taskMap. It also checks if the task is syntactically
    * valid or not.
