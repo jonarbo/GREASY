@@ -15,6 +15,7 @@
 
 @SET_MAKE@
 
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -33,17 +34,16 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 subdir = example
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(srcdir)/bsc_greasy.job.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = bsc_greasy.job
 CONFIG_CLEAN_VPATH_FILES =
-SOURCES =
-DIST_SOURCES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -65,7 +65,10 @@ am__nobase_list = $(am__nobase_strip_setup); \
 am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
-am__installdirs = "$(DESTDIR)$(exampledir)"
+am__installdirs = "$(DESTDIR)$(exampledir)" "$(DESTDIR)$(exampledir)"
+SCRIPTS = $(example_SCRIPTS)
+SOURCES =
+DIST_SOURCES =
 DATA = $(example_DATA)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
@@ -134,7 +137,9 @@ datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
+greasy_bindir = @greasy_bindir@
 greasy_engine = @greasy_engine@
+greasy_etcdir = @greasy_etcdir@
 host_alias = @host_alias@
 htmldir = @htmldir@
 includedir = @includedir@
@@ -144,6 +149,7 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
+machine_mpirun = @machine_mpirun@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 mpicxx_present = @mpicxx_present@
@@ -161,7 +167,9 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 exampledir = $(prefix)/example
-example_DATA = bsc_greasy.job example.txt short-example.txt
+example_DATA = example.txt short-example.txt
+example_SCRIPTS = bsc_greasy.job 
+EXTRA_DIST = bsc_greasy.job  example.txt short-example.txt 
 all: all-am
 
 .SUFFIXES:
@@ -195,6 +203,42 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+bsc_greasy.job: $(top_builddir)/config.status $(srcdir)/bsc_greasy.job.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+install-exampleSCRIPTS: $(example_SCRIPTS)
+	@$(NORMAL_INSTALL)
+	test -z "$(exampledir)" || $(MKDIR_P) "$(DESTDIR)$(exampledir)"
+	@list='$(example_SCRIPTS)'; test -n "$(exampledir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  if test -f "$$d$$p"; then echo "$$d$$p"; echo "$$p"; else :; fi; \
+	done | \
+	sed -e 'p;s,.*/,,;n' \
+	    -e 'h;s|.*|.|' \
+	    -e 'p;x;s,.*/,,;$(transform)' | sed 'N;N;N;s,\n, ,g' | \
+	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1; } \
+	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
+	    if ($$2 == $$4) { files[d] = files[d] " " $$1; \
+	      if (++n[d] == $(am__install_max)) { \
+		print "f", d, files[d]; n[d] = 0; files[d] = "" } } \
+	    else { print "f", d "/" $$4, $$1 } } \
+	  END { for (d in files) print "f", d, files[d] }' | \
+	while read type dir files; do \
+	     if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
+	     test -z "$$files" || { \
+	       echo " $(INSTALL_SCRIPT) $$files '$(DESTDIR)$(exampledir)$$dir'"; \
+	       $(INSTALL_SCRIPT) $$files "$(DESTDIR)$(exampledir)$$dir" || exit $$?; \
+	     } \
+	; done
+
+uninstall-exampleSCRIPTS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(example_SCRIPTS)'; test -n "$(exampledir)" || exit 0; \
+	files=`for p in $$list; do echo "$$p"; done | \
+	       sed -e 's,.*/,,;$(transform)'`; \
+	test -n "$$list" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(exampledir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(exampledir)" && rm -f $$files
 install-exampleDATA: $(example_DATA)
 	@$(NORMAL_INSTALL)
 	test -z "$(exampledir)" || $(MKDIR_P) "$(DESTDIR)$(exampledir)"
@@ -254,9 +298,9 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(DATA)
+all-am: Makefile $(SCRIPTS) $(DATA)
 installdirs:
-	for dir in "$(DESTDIR)$(exampledir)"; do \
+	for dir in "$(DESTDIR)$(exampledir)" "$(DESTDIR)$(exampledir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -304,7 +348,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-exampleDATA
+install-data-am: install-exampleDATA install-exampleSCRIPTS
 
 install-dvi: install-dvi-am
 
@@ -348,20 +392,21 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-exampleDATA
+uninstall-am: uninstall-exampleDATA uninstall-exampleSCRIPTS
 
 .MAKE: install-am install-strip
 
 .PHONY: all all-am check check-am clean clean-generic distclean \
 	distclean-generic distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exampleDATA install-exec \
-	install-exec-am install-html install-html-am install-info \
-	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
+	install-dvi-am install-exampleDATA install-exampleSCRIPTS \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-generic pdf \
-	pdf-am ps ps-am uninstall uninstall-am uninstall-exampleDATA
+	pdf-am ps ps-am uninstall uninstall-am uninstall-exampleDATA \
+	uninstall-exampleSCRIPTS
 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

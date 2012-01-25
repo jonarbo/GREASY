@@ -605,6 +605,8 @@ ac_includes_default="\
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
+greasy_etcdir
+greasy_bindir
 THREAD_ENGINE_FALSE
 THREAD_ENGINE_TRUE
 SLURM_ENGINE_FALSE
@@ -613,6 +615,7 @@ LIBOBJS
 EGREP
 GREP
 CPP
+machine_mpirun
 am__fastdepCXX_FALSE
 am__fastdepCXX_TRUE
 CXXDEPMODE
@@ -4218,6 +4221,55 @@ fi
 
   greasy_engine=mpi
 
+
+  for ac_prog in mnrun srun mpirun mpiexec
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_machine_mpirun+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$machine_mpirun"; then
+  ac_cv_prog_machine_mpirun="$machine_mpirun" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_machine_mpirun="$ac_prog"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+machine_mpirun=$ac_cv_prog_machine_mpirun
+if test -n "$machine_mpirun"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $machine_mpirun" >&5
+$as_echo "$machine_mpirun" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$machine_mpirun" && break
+done
+test -n "$machine_mpirun" || machine_mpirun="no-mpirun-found"
+
+  if test x$machine_mpirun = xno-mpirun-found; then
+    as_fn_error $? "Fatal Error: no MPI executer found" "$LINENO" 5
+    exit;
+  fi
+
 else
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -5474,7 +5526,6 @@ done
 
 # Checks for other command line options
 
-
 # Check whether --enable-slurm-engine was given.
 if test "${enable_slurm_engine+set}" = set; then :
   enableval=$enable_slurm_engine; slurm_engine=${enableval}
@@ -5511,9 +5562,12 @@ else
 fi
 
 
-#AC_DEFINE(SYSTEM_CFG, , System Config file)
+greasy_bindir=$prefix/bin
 
-ac_config_files="$ac_config_files Makefile src/Makefile etc/Makefile etc/greasy.conf doc/Makefile example/Makefile bin/Makefile"
+greasy_etcdir=$prefix/etc
+
+
+ac_config_files="$ac_config_files Makefile src/Makefile etc/Makefile etc/greasy.conf doc/Makefile example/Makefile example/bsc_greasy.job bin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -6272,6 +6326,7 @@ do
     "etc/greasy.conf") CONFIG_FILES="$CONFIG_FILES etc/greasy.conf" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "example/Makefile") CONFIG_FILES="$CONFIG_FILES example/Makefile" ;;
+    "example/bsc_greasy.job") CONFIG_FILES="$CONFIG_FILES example/bsc_greasy.job" ;;
     "bin/Makefile") CONFIG_FILES="$CONFIG_FILES bin/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

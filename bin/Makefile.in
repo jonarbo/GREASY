@@ -134,7 +134,9 @@ datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
+greasy_bindir = @greasy_bindir@
 greasy_engine = @greasy_engine@
+greasy_etcdir = @greasy_etcdir@
 host_alias = @host_alias@
 htmldir = @htmldir@
 includedir = @includedir@
@@ -144,6 +146,7 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
+machine_mpirun = @machine_mpirun@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 mpicxx_present = @mpicxx_present@
@@ -161,6 +164,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 bin_SCRIPTS = greasycolorlog
+EXTRA_DIST = greasycolorlog
 all: all-am
 
 .SUFFIXES:

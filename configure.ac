@@ -36,6 +36,13 @@ if test x$mpi_engine = xyes; then
   fi
   AC_PROG_CXX
   AC_SUBST(greasy_engine,[mpi])
+  
+  AC_CHECK_PROGS(machine_mpirun,[mnrun srun mpirun mpiexec],[no-mpirun-found])
+  if test x$machine_mpirun = xno-mpirun-found; then
+    AC_MSG_ERROR([Fatal Error: no MPI executer found])
+    exit;
+  fi
+
 else
   AC_PROG_CXX
 fi
@@ -58,7 +65,6 @@ AC_CHECK_FUNCS([getcwd gethostname gettimeofday regcomp])
 
 # Checks for other command line options
 
-
 AC_ARG_ENABLE(slurm-engine,
   [  --enable-slurm-engine    enable SLURM engine (not implemented yet)],
   [slurm_engine=${enableval}],
@@ -75,6 +81,7 @@ AC_ARG_ENABLE(thread-engine,
 
 AM_CONDITIONAL(THREAD_ENGINE, test x$thread_engine = xyes)
 
-#AC_DEFINE(SYSTEM_CFG, , System Config file)
+AC_SUBST(greasy_bindir,[$prefix/bin])
+AC_SUBST(greasy_etcdir,[$prefix/etc])
 
-AC_OUTPUT(Makefile src/Makefile etc/Makefile etc/greasy.conf doc/Makefile example/Makefile bin/Makefile)
+AC_OUTPUT(Makefile src/Makefile etc/Makefile etc/greasy.conf doc/Makefile example/Makefile example/bsc_greasy.job bin/Makefile)
