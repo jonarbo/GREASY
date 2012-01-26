@@ -1,0 +1,312 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A126495E0B83936D0091D5AD /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8D0C4E960486CD37000505A6 /* Info.plist */; };
+		A18D2A340B861B99007D8D2C /* libtbb.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A18D2A330B861B99007D8D2C /* libtbb.dylib */; };
+		A1A8F41E0B8B4DBE001C55B1 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1A8F41D0B8B4DBE001C55B1 /* AGL.framework */; };
+		A1A8F4310B8B4EA8001C55B1 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1A8F4300B8B4EA8001C55B1 /* Carbon.framework */; };
+		A1D44D9A0B861E8A0006E401 /* libtbb.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = A18D2A330B861B99007D8D2C /* libtbb.dylib */; };
+		A1E3E7BD0B3AD4EC007C3AB5 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1E3E7BC0B3AD4EC007C3AB5 /* OpenGL.framework */; };
+		A1F591AC0B8DFC9600073279 /* macvideo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A1F591AA0B8DFC9600073279 /* macvideo.cpp */; };
+		EA135CEA130D076D00807847 /* fractal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA135CE6130D076D00807847 /* fractal.cpp */; };
+		EA135CEB130D076D00807847 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA135CE9130D076D00807847 /* main.cpp */; };
+		EA135D0B130D0AA200807847 /* main.nib in Resources */ = {isa = PBXBuildFile; fileRef = EA135D09130D0AA200807847 /* main.nib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A18D2A370B861BB7007D8D2C /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				A1D44D9A0B861E8A0006E401 /* libtbb.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		8D0C4E960486CD37000505A6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		8D0C4E970486CD37000505A6 /* fractal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = fractal.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A18D2A330B861B99007D8D2C /* libtbb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbb.dylib; path = ../../../../lib/libtbb.dylib; sourceTree = SOURCE_ROOT; };
+		A1A8F41D0B8B4DBE001C55B1 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
+		A1A8F4300B8B4EA8001C55B1 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		A1E3E7BC0B3AD4EC007C3AB5 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
+		A1F591AA0B8DFC9600073279 /* macvideo.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = macvideo.cpp; path = ../../../common/gui/macvideo.cpp; sourceTree = SOURCE_ROOT; };
+		A1F591AB0B8DFC9600073279 /* video.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = video.h; path = ../../../common/gui/video.h; sourceTree = SOURCE_ROOT; };
+		EA135CE6130D076D00807847 /* fractal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fractal.cpp; path = ../fractal.cpp; sourceTree = SOURCE_ROOT; };
+		EA135CE7130D076D00807847 /* fractal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fractal.h; path = ../fractal.h; sourceTree = SOURCE_ROOT; };
+		EA135CE8130D076D00807847 /* fractal_video.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fractal_video.h; path = ../fractal_video.h; sourceTree = SOURCE_ROOT; };
+		EA135CE9130D076D00807847 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../main.cpp; sourceTree = SOURCE_ROOT; };
+		EA135D0A130D0AA200807847 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/main.nib; sourceTree = "<group>"; };
+		EA135E71130D2A0E00807847 /* fractal.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fractal.pch; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8D0C4E910486CD37000505A6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1E3E7BD0B3AD4EC007C3AB5 /* OpenGL.framework in Frameworks */,
+				A18D2A340B861B99007D8D2C /* libtbb.dylib in Frameworks */,
+				A1A8F41E0B8B4DBE001C55B1 /* AGL.framework in Frameworks */,
+				A1A8F4310B8B4EA8001C55B1 /* Carbon.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		195DF8CFFE9D517E11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8D0C4E970486CD37000505A6 /* fractal.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		20286C29FDCF999611CA2CEA /* fractal */ = {
+			isa = PBXGroup;
+			children = (
+				20286C2AFDCF999611CA2CEA /* Sources */,
+				20286C2CFDCF999611CA2CEA /* Resources */,
+				20286C32FDCF999611CA2CEA /* External Frameworks and Libraries */,
+				195DF8CFFE9D517E11CA2CBB /* Products */,
+			);
+			name = fractal;
+			sourceTree = "<group>";
+		};
+		20286C2AFDCF999611CA2CEA /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				EA135E71130D2A0E00807847 /* fractal.pch */,
+				EA135CE8130D076D00807847 /* fractal_video.h */,
+				EA135CE7130D076D00807847 /* fractal.h */,
+				EA135CE9130D076D00807847 /* main.cpp */,
+				EA135CE6130D076D00807847 /* fractal.cpp */,
+				A1F591AA0B8DFC9600073279 /* macvideo.cpp */,
+				A1F591AB0B8DFC9600073279 /* video.h */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+		20286C2CFDCF999611CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				EA135D09130D0AA200807847 /* main.nib */,
+				8D0C4E960486CD37000505A6 /* Info.plist */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		20286C32FDCF999611CA2CEA /* External Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				A18D2A330B861B99007D8D2C /* libtbb.dylib */,
+				A1A8F4300B8B4EA8001C55B1 /* Carbon.framework */,
+				A1A8F41D0B8B4DBE001C55B1 /* AGL.framework */,
+				A1E3E7BC0B3AD4EC007C3AB5 /* OpenGL.framework */,
+			);
+			name = "External Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8D0C4E890486CD37000505A6 /* fractal */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C0E91AC508A95435008D54AB /* Build configuration list for PBXNativeTarget "fractal" */;
+			buildPhases = (
+				8D0C4E8C0486CD37000505A6 /* Resources */,
+				8D0C4E8F0486CD37000505A6 /* Sources */,
+				8D0C4E910486CD37000505A6 /* Frameworks */,
+				A18D2A370B861BB7007D8D2C /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = fractal;
+			productInstallPath = "$(HOME)/Applications";
+			productName = fractal;
+			productReference = 8D0C4E970486CD37000505A6 /* fractal.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		20286C28FDCF999611CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0410;
+			};
+			buildConfigurationList = C0E91AC908A95435008D54AB /* Build configuration list for PBXProject "fractal" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 20286C29FDCF999611CA2CEA /* fractal */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8D0C4E890486CD37000505A6 /* fractal */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8D0C4E8C0486CD37000505A6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A126495E0B83936D0091D5AD /* Info.plist in Resources */,
+				EA135D0B130D0AA200807847 /* main.nib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8D0C4E8F0486CD37000505A6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1F591AC0B8DFC9600073279 /* macvideo.cpp in Sources */,
+				EA135CEA130D076D00807847 /* fractal.cpp in Sources */,
+				EA135CEB130D076D00807847 /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		EA135D09130D0AA200807847 /* main.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EA135D0A130D0AA200807847 /* English */,
+			);
+			name = main.nib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		C0E91AC608A95435008D54AB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = "";
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = fractal.pch;
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = ../../../../include;
+				IBC_STRIP_NIBS = NO;
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					../../../../lib,
+				);
+				PRODUCT_NAME = fractal;
+				SDKROOT = macosx10.6;
+			};
+			name = Debug;
+		};
+		C0E91AC708A95435008D54AB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = "";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = fractal.pch;
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = ../../../../include;
+				IBC_STRIP_NIBS = NO;
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					../../../../lib,
+				);
+				OTHER_CPLUSPLUSFLAGS = "";
+				PRODUCT_NAME = fractal;
+				PUBLIC_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/Headers";
+				SDKROOT = macosx10.6;
+				STRIPFLAGS = "";
+			};
+			name = Release;
+		};
+		C0E91ACA08A95435008D54AB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = i386;
+				GCC_AUTO_VECTORIZATION = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_ENABLE_SSE3_EXTENSIONS = YES;
+				GCC_MODEL_TUNING = "";
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
+				IBC_STRIP_NIBS = NO;
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
+				SDKROOT = macosx10.6;
+				SYMROOT = "/tmp/tbb-$(USER)";
+			};
+			name = Debug;
+		};
+		C0E91ACB08A95435008D54AB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = i386;
+				GCC_AUTO_VECTORIZATION = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_ENABLE_SSE3_EXTENSIONS = YES;
+				GCC_MODEL_TUNING = "";
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
+				IBC_STRIP_NIBS = NO;
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
+				SDKROOT = macosx10.6;
+				SYMROOT = "/tmp/tbb-$(USER)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C0E91AC508A95435008D54AB /* Build configuration list for PBXNativeTarget "fractal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0E91AC608A95435008D54AB /* Debug */,
+				C0E91AC708A95435008D54AB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C0E91AC908A95435008D54AB /* Build configuration list for PBXProject "fractal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0E91ACA08A95435008D54AB /* Debug */,
+				C0E91ACB08A95435008D54AB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 20286C28FDCF999611CA2CEA /* Project object */;
+}

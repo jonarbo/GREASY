@@ -1,0 +1,36 @@
+<?xml version="1.0" standalone="yes"?>
+<object class="NSIBObjectData">
+  <object name="rootObject" class="NSCustomObject" id="1">
+  </object>
+  <array count="2" name="allObjects">
+    <object class="IBCarbonRootControl" id="167">
+      <string name="viewFrame">0 0 480 360 </string>
+      <string name="bounds">0 0 360 480 </string>
+    </object>
+    <object class="IBCarbonWindow" id="166">
+      <boolean name="receiveUpdates">FALSE</boolean>
+      <boolean name="compositing">TRUE</boolean>
+      <boolean name="asyncDrag">TRUE</boolean>
+      <boolean name="doesNotCycle">TRUE</boolean>
+      <int name="themeBrush">-1</int>
+      <string name="title">Fractal</string>
+      <reference name="rootControl" idRef="167"/>
+      <string name="windowRect">338 353 698 833 </string>
+      <string name="ScreenRectAtEncodeTime">0 0 768 1024 </string>
+      <int name="WindowMinWidth">320</int>
+      <int name="WindowMinHeight">200</int>
+    </object>
+  </array>
+  <array count="2" name="allParents">
+    <reference idRef="166"/>
+    <reference idRef="1"/>
+  </array>
+  <dictionary count="2" name="nameTable">
+    <string>File&apos;s Owner</string>
+    <reference idRef="1"/>
+    <string>MainWindow</string>
+    <reference idRef="166"/>
+  </dictionary>
+  <string name="targetFramework">IBCarbonFramework</string>
+  <unsigned_int name="nextObjectID">219</unsigned_int>
+</object>
