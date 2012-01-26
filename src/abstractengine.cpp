@@ -74,10 +74,18 @@ void AbstractEngine::init() {
     log->record(GreasyLog::warning,  "Invalid tasks found. Greasy will ignore them");  
   }
   
-  if (!fileErrors) { 
-    ready = true;
-    log->record(GreasyLog::info,  "Engine " + toUpper(engineType) + " ready to run");  
+  if (!fileErrors) {
+    if(nworkers>0) {  
+      ready = true;
+      log->record(GreasyLog::info,  "Engine " + toUpper(engineType) + " is now ready to run with "
+				  + toString(nworkers) + " workers"); 
+    } else {
+      log->record(GreasyLog::error,  "Engine " + toUpper(engineType) + " has no workers. Please check your greasy setup");
+    }
   }
+  log->record(GreasyLog::devel,  "Configuration contents:\n\n" + config->printContents()); 
+  log->record(GreasyLog::devel,  "End of configuration contents"); 
+  
   log->record(GreasyLog::devel, "AbstractEngine::init", "Exiting...");
   
 }

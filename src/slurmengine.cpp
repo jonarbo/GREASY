@@ -1,21 +1,25 @@
 #include "slurmengine.h"
+#include <csignal>
+#include <cstdlib>
+#include <cstring>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
-SlurmEngine::SlurmEngine (const string& filename ): AbstractEngine(filename) {
+SlurmEngine::SlurmEngine ( const string& filename) : BasicEngine(filename){
   
   engineType="slurm";
   
 }
 
-void SlurmEngine::run() {
+int SlurmEngine::executeTask(GreasyTask *task, int worker) {
   
-  map<int,GreasyTask*>::iterator it;
-  log->record(GreasyLog::devel, "SlurmEngine::run", "Entering...");
-  
-  log->record(GreasyLog::devel, "SlurmEngine::run", "Let's see what we've got...");
-  for (it=taskMap.begin();it!=taskMap.end(); it++) {
-    log->record(GreasyLog::devel, it->second->dump());
-  }
-  
-  log->record(GreasyLog::devel, "SlurmEngine::run", "Exiting...");
+  string command = "srun -n1 " + task->getCommand();
+  log->record(GreasyLog::devel,  "SlurmEngine::allocate[" + toString(worker) +"]", "Task " 
+		      + toString(task->getTaskId()) + " command: " + command);
+  return system(command.c_str());
   
 }
+
+
+

@@ -2,27 +2,39 @@
 #define SLURMENGINE_H
 
 #include <string>
+#include <queue>
+#include <map>
+#include <limits.h>
 
-#include "abstractengine.h"
+#include "basicengine.h"
 
 /**
-  * class SlurmEngine
-  * 
+  * This engine inherits AbstractSchedulerEngine, and implements a basic scheduler and launcher
+  * for Greasy using Slurm's srun
   */
-class SlurmEngine : public AbstractEngine
+class SlurmEngine : public BasicEngine
 {
   
 public:
 
   /**
-   * Empty Constructor
+   * Constructor that adds the filename to process.
+   * @param filename path to the task file.
    */
-  SlurmEngine ( const string& filename);
+  SlurmEngine (const string& filename ); 
   
-  void run();
 
 protected:
-
+  
+  /**
+   * Run the command corresponding to a task using srun to spawn the process in the right place.
+   * @param task The task to be executed.
+   * @param worker The index of the worker in charge.
+   * @return The exit status of the command.
+   */  
+  virtual int executeTask(GreasyTask *task, int worker);
+  
 };
+
 
 #endif // SLURMENGINE_H

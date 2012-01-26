@@ -34,7 +34,18 @@ FILE=short-example.txt
 
 export GREASY_LOGFILE=greasy-$SLURM_JOBID.log
 
+##############################################
+# If running this script interactively, please
+# set the desired number of workers. The number
+# of workers should not be higher than the 
+# available cpus.
+##############################################
 
+# export GREASY_NWORKERS=4
+
+
+#################################
+#################################
 #################################
 # Do not edit beyond this line
 #################################
@@ -51,6 +62,10 @@ if [ "$GREASY_ENGINE" = "mpi" ]; then
   MPIRUN=@machine_mpirun@
 else
   MPIRUN=""
+fi
+
+if [ -n "$SLURM_NPROCS" ]; then
+  GREASY_NWORKERS=$SLURM_NPROCS
 fi
 
 # Run Greasy

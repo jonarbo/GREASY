@@ -606,6 +606,7 @@ TBB_LOCAL_FALSE
 TBB_LOCAL_TRUE
 THREAD_ENGINE_FALSE
 THREAD_ENGINE_TRUE
+srun_present
 SLURM_ENGINE_FALSE
 SLURM_ENGINE_TRUE
 LIBOBJS
@@ -1339,7 +1340,7 @@ Optional Features:
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
   --enable-mpi-engine    enable MPI engine (default=no)
-  --enable-slurm-engine    enable SLURM engine (not implemented yet)
+  --enable-slurm-engine    enable SLURM engine
   --enable-thread-engine    enable THREAD engine (not implemented yet)
 
 Optional Packages:
@@ -5563,6 +5564,56 @@ else
   SLURM_ENGINE_FALSE=
 fi
 
+
+if test x$slurm_engine = xyes; then
+
+  # Extract the first word of "srun", so it can be a program name with args.
+set dummy srun; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_srun_present+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$srun_present"; then
+  ac_cv_prog_srun_present="$srun_present" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_srun_present="yes"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_prog_srun_present" && ac_cv_prog_srun_present="no"
+fi
+fi
+srun_present=$ac_cv_prog_srun_present
+if test -n "$srun_present"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $srun_present" >&5
+$as_echo "$srun_present" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  if test x$srun_present = xno; then
+    as_fn_error $? "Fatal Error: srun command not found" "$LINENO" 5
+    exit;
+  fi
+
+  greasy_engine=slurm
+
+
+fi
 
 #TODO: Implement checks for SLURM
 

@@ -7,9 +7,13 @@
 AbstractSchedulerEngine::AbstractSchedulerEngine ( const string& filename) : AbstractEngine(filename){
   
   // Set the number of workers
-  if (config->keyExists("NWorkers")) 
+  if (config->keyExists("NWorkers")) {
     nworkers = fromString(nworkers, config->getValue("NWorkers"));
-  else getDefaultNWorkers();
+  } else { 
+    getDefaultNWorkers();
+    log->record(GreasyLog::warning, "Falling back to the default number of workers " + toString(nworkers));
+    log->record(GreasyLog::warning, "Consider setting environment variable GREASY_NWORKERS to the desired cpus to use");
+  }
   
 }
 
@@ -185,6 +189,8 @@ void AbstractSchedulerEngine::taskEpilogue(GreasyTask *task) {
 void AbstractSchedulerEngine::getDefaultNWorkers() {
  
   nworkers = sysconf(_SC_NPROCESSORS_ONLN);
+  if ( nworkers>4 ) nworkers=4;
+  
   log->record(GreasyLog::devel, "AbstractSchedulerEngine::getDefaultNWorkers", "Default nworkers: " + toString(nworkers));
   
 }
