@@ -33,6 +33,11 @@ AbstractEngine* AbstractEngineFactory::getAbstractEngineInstance(const string& f
       return new SlurmEngine(filename);
   #endif
 
+  #ifdef THREAD_ENGINE
+  if (type == "thread")
+      return new ThreadEngine(filename);
+  #endif
+
   GreasyLog::getInstance()->record(GreasyLog::error, "Wrong engine type requested!!! This version does not supports '" + type + "' scheduler");
 
   return NULL;
