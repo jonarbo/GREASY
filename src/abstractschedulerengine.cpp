@@ -7,9 +7,9 @@
 AbstractSchedulerEngine::AbstractSchedulerEngine ( const string& filename) : AbstractEngine(filename){
   
   // Set the number of workers
-  if (config->keyExists("NWorkers")) 
+  if (config->keyExists("NWorkers")) {
     nworkers = fromString(nworkers, config->getValue("NWorkers"));
-  else { 
+  } else { 
     getDefaultNWorkers();
     log->record(GreasyLog::warning, "Falling back to the default number of workers " + toString(nworkers));
     log->record(GreasyLog::warning, "Consider setting environment variable GREASY_NWORKERS to the desired cpus to use");

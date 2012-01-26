@@ -66,11 +66,23 @@ AC_CHECK_FUNCS([getcwd gethostname gettimeofday regcomp])
 # Checks for other command line options
 
 AC_ARG_ENABLE(slurm-engine,
-  [  --enable-slurm-engine    enable SLURM engine (not implemented yet)],
+  [  --enable-slurm-engine    enable SLURM engine],
   [slurm_engine=${enableval}],
   [slurm_engine=no])
 
 AM_CONDITIONAL(SLURM_ENGINE, test x$slurm_engine = xyes)
+
+if test x$slurm_engine = xyes; then
+
+  AC_CHECK_PROG(srun_present,[srun],[yes],[no])
+  if test x$srun_present = xno; then
+    AC_MSG_ERROR([Fatal Error: srun command not found])
+    exit;
+  fi
+
+  AC_SUBST(greasy_engine,[slurm])
+
+fi
 
 #TODO: Implement checks for SLURM
 

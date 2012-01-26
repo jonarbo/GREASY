@@ -90,11 +90,6 @@ void MPIEngine::run() {
     if (isMaster()) runMaster();
     else if (isWorker()) runWorker();
     else log->record(GreasyLog::error,  "Could not run MPI engine");
-  } else {
-    if (isMaster()) {
-      log->record(GreasyLog::error, "Engine is not ready to run. Check your task file and configuration.");
-      fireWorkers();
-    }
   }
 
   log->record(GreasyLog::devel, "MPIEngine::run", "Exiting...");

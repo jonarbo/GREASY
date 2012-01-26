@@ -43,6 +43,14 @@ protected:
    */
   virtual void waitForAnyWorker();
   
+  /**
+   * Run the command corresponding to a task.
+   * @param task The task to be executed.
+   * @param worker The index of the worker in charge.
+   * @return The exit status of the command.
+   */  
+  virtual int executeTask(GreasyTask *task, int worker);
+  
   map<pid_t,int> pidToWorker; /**<  Map to translate a pid to the corresponding worker. */
   map<int, GreasyTimer> workerTimers; /**<  Map of worker timers to know elapsed time of tasks. */
   char hostname[HOST_NAME_MAX]; ///< Cstring to hold the worker hostname.

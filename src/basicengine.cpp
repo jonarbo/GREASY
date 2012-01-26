@@ -17,7 +17,7 @@ void BasicEngine::run() {
   
   log->record(GreasyLog::devel, "BasicEngine::run", "Entering...");
   
-  runScheduler();
+  if (isReady()) runScheduler();
 
   log->record(GreasyLog::devel, "BasicEngine::run", "Exiting...");
 
@@ -40,7 +40,7 @@ void BasicEngine::allocate(GreasyTask* task) {
   if (pid == 0) {
    //Child process will exec command...
    // We use system instead of exec because of greater compatibility with command to be executed
-   exit(system(task->getCommand().c_str()));  
+   exit(executeTask(task,worker));  
   } else if (pid > 0) {
     // parent
     log->record(GreasyLog::debug,  "BasicEngine::allocate", "Task " 
@@ -98,4 +98,11 @@ void BasicEngine::waitForAnyWorker() {
   
   log->record(GreasyLog::devel, "BasicEngine::waitForAnyWorker", "Exiting...");
   
+}
+
+int BasicEngine::executeTask(GreasyTask *task, int worker) {
+  
+  log->record(GreasyLog::devel,  "BasicEngine::allocate[" + toString(worker) +"]", "Task " 
+		      + toString(task->getTaskId()) + " command: " + task->getCommand());
+  return system(task->getCommand().c_str());  
 }
