@@ -5571,7 +5571,7 @@ if test x$slurm_engine = xyes; then
 set dummy srun; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_srun_present+:} false; then :
+if test "${ac_cv_prog_srun_present+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
   if test -n "$srun_present"; then
@@ -5606,7 +5606,7 @@ fi
 
 
   if test x$srun_present = xno; then
-    as_fn_error $? "Fatal Error: srun command not found" "$LINENO" 5
+    as_fn_error "Fatal Error: srun command not found" "$LINENO" 5
     exit;
   fi
 

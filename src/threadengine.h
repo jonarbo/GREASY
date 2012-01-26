@@ -26,6 +26,12 @@ public:
    */
   ThreadEngine (const string& filename );
 
+ /**
+  * Execute the engine. It is divided into 2 different parts, for master and workers.
+  */
+ virtual void run();
+
+
   /**
    * reimplementation of the init() method adding the workers init code.
    */

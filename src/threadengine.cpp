@@ -13,6 +13,12 @@ ThreadEngine::ThreadEngine ( const string& filename) : AbstractEngine(filename){
 
 }
 
+void ThreadEngine::run(){
+	log->record(GreasyLog::devel, "ThreadEngine::run", "Entering...");
+	if (isReady()) runScheduler();
+	log->record(GreasyLog::devel, "ThreadEngine::run", "Exiting...");
+}
+
 void ThreadEngine::init() {
 
   log->record(GreasyLog::devel, "ThreadEngine::init", "Entering...");
