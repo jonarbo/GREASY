@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.68])
+AC_PREREQ([2.65])
 AC_INIT([greasy], [2.0], [support@bsc.es])
 AM_INIT_AUTOMAKE(greasy,2.0)
 AC_CONFIG_SRCDIR([src/greasylog.h])
@@ -79,7 +79,36 @@ AC_ARG_ENABLE(thread-engine,
   [thread_engine=${enableval}],
   [thread_engine=no])
 
+# check for threads TBB
 AM_CONDITIONAL(THREAD_ENGINE, test x$thread_engine = xyes)
+
+# check for local TBB
+AC_ARG_WITH([tbb],
+   [AS_HELP_STRING([--with-tbb], [Path to the system TBB installation. Otherwise will use the TBB version distributed with GREASY])], 
+   [tbb=$withval], 
+   [tbb=no])
+
+
+AM_CONDITIONAL(TBB_LOCAL, false )
+if test x$thread_engine = xyes; then
+
+  AC_DEFINE(THREAD_ENGINE, 1, Thread Engine enabled with TBB)
+
+   if test x$tbb != xno; then 
+	# use system TBB
+	echo "Using system TBB in $tbb"
+	AC_SUBST(tbb_include,[$tbb/include])
+	AC_SUBST(tbb_libs,[$tbb/libs])
+   else
+	echo "Using TBB provided by GREASY...will compile TBB sources"
+	AC_SUBST(my_tbb_root,[3rdparty/tbb])
+	AM_CONDITIONAL(TBB_LOCAL, true )
+   fi
+else
+   if test x$tbb != xno; then 
+	echo "Skipping '--with-tbb' option ... if you want to use TBB you must '--enable-thread-engine'"
+   fi
+fi 
 
 AC_SUBST(greasy_bindir,[$prefix/bin])
 AC_SUBST(greasy_etcdir,[$prefix/etc])

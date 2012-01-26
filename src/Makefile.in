@@ -38,7 +38,8 @@ bin_PROGRAMS = greasy$(EXEEXT)
 @SLURM_ENGINE_TRUE@am__append_3 = slurmengine.cpp slurmengine.h 
 @SLURM_ENGINE_TRUE@am__append_4 = -DSLURM_ENGINE
 @THREAD_ENGINE_TRUE@am__append_5 = threadengine.cpp threadengine.h 
-@THREAD_ENGINE_TRUE@am__append_6 = -DTHREAD_ENGINE
+@TBB_LOCAL_TRUE@@THREAD_ENGINE_TRUE@am__append_6 = -DTHREAD_ENGINE -I@my_tbb_root@/include 
+@TBB_LOCAL_FALSE@@THREAD_ENGINE_TRUE@am__append_7 = -DTHREAD_ENGINE -I@tbb_include@
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -169,6 +170,7 @@ machine_mpirun = @machine_mpirun@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 mpicxx_present = @mpicxx_present@
+my_tbb_root = @my_tbb_root@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
@@ -179,11 +181,14 @@ sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
+tbb_include = @tbb_include@
+tbb_libs = @tbb_libs@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -DSYSTEM_CFG=\"@sysconfdir@/greasy.conf\" \
-	$(am__append_2) $(am__append_4) $(am__append_6)
+	$(am__append_2) $(am__append_4) $(am__append_6) \
+	$(am__append_7)
 greasy_SOURCES = abstractengine.cpp abstractengine.h \
 	abstractschedulerengine.cpp abstractschedulerengine.h \
 	basicengine.cpp basicengine.h greasyconfig.cpp greasyconfig.h \
@@ -191,6 +196,10 @@ greasy_SOURCES = abstractengine.cpp abstractengine.h \
 	greasyregex.h greasytask.cpp greasytask.h greasytimer.cpp \
 	greasytimer.h greasyutils.h $(am__append_1) $(am__append_3) \
 	$(am__append_5)
+@TBB_LOCAL_TRUE@@THREAD_ENGINE_TRUE@greasy_DEPENDENCIES = tbb 
+@TBB_LOCAL_TRUE@@THREAD_ENGINE_TRUE@tbb_root = $(CURDIR)/@my_tbb_root@
+@TBB_LOCAL_FALSE@@THREAD_ENGINE_TRUE@AM_LDFLAGS = -L@tbb_libs@ -ltbb 
+@TBB_LOCAL_TRUE@@THREAD_ENGINE_TRUE@AM_LDFLAGS = -L@my_tbb_root@/build/$(tbb_build_prefix)_release -ltbb 
 all: all-am
 
 .SUFFIXES:
@@ -497,6 +506,12 @@ uninstall-am: uninstall-binPROGRAMS
 	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
 	uninstall-am uninstall-binPROGRAMS
 
+@TBB_LOCAL_TRUE@@THREAD_ENGINE_TRUE@include @my_tbb_root@/build/common.inc	
+
+@TBB_LOCAL_TRUE@@THREAD_ENGINE_TRUE@.PHONY: tbb
+@TBB_LOCAL_TRUE@@THREAD_ENGINE_TRUE@tbb:
+@TBB_LOCAL_TRUE@@THREAD_ENGINE_TRUE@	@echo "Compiling local version of TBB..."
+@TBB_LOCAL_TRUE@@THREAD_ENGINE_TRUE@	@cd @my_tbb_root@ && $(MAKE) $(AM_MAKEFLAGS) tbb && cd - 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
