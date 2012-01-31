@@ -87,7 +87,7 @@ fi
 #TODO: Implement checks for SLURM
 
 AC_ARG_ENABLE(thread-engine,
-  [  --enable-thread-engine    enable THREAD engine (not implemented yet)],
+  [  --enable-thread-engine    enable THREAD engine. This option will use TBB. The configure will use the system TBB (if any) specified with the option --with-tbb otherwise, a local the version of TBB will be compiled.
   [thread_engine=${enableval}],
   [thread_engine=no])
 

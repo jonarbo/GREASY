@@ -31,7 +31,7 @@ tbb:
 else
 
 AM_CPPFLAGS += -DTHREAD_ENGINE -I@tbb_include@
-AM_LDFLAGS  = -L@tbb_libs@ -ltbb 
+AM_LDFLAGS  = -R@tbb_libs@ -L@tbb_libs@ -ltbb 
 
 endif 
 
