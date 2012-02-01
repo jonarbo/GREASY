@@ -6,7 +6,7 @@
 
 #include "tbb/tbb.h"
 #include "tbb/task.h"
-#include "tbb/tick_count.h"
+//#include "tbb/tick_count.h"
 #include "tbb/task_scheduler_init.h"
 
 /**
@@ -171,7 +171,7 @@ public:
 protected:
 
     GreasyTask* const gtask;
-    tbb::tick_count start,end;
+    GreasyTimer timer;
 };
 
 

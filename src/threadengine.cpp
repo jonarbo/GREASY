@@ -66,7 +66,7 @@ void ThreadEngine::runScheduler(){
   tbb::task_scheduler_init init(nworkers) ;
 
   // start counter
-  tbb::tick_count globalStartTime = tbb::tick_count::now();
+  globalTimer.start();
 
   log->record(GreasyLog::debug, "ThreadEngine::runScheduler", "Starting to launch tasks...");
 
@@ -76,12 +76,8 @@ void ThreadEngine::runScheduler(){
 
   log->record(GreasyLog::debug, "ThreadEngine::runScheduler", "All tasks lauched");
 
-
   // end counter
-  tbb::tick_count globalEndTime = tbb::tick_count::now();
-
-  // compute total elapsed
-  GreasyTimer::secsToTime( (globalEndTime-globalStartTime).seconds() );
+  globalTimer.stop();
 
   log->record(GreasyLog::devel, "ThreadEngine::runScheduler", "Exiting...");
 }
@@ -157,8 +153,11 @@ void GreasyTBBTaskContinuation::updateDependencies(GreasyTask* child_){
 
     log->record(GreasyLog::devel, "GreasyTBBTaskContinuation::updateDependencies", "Entering...");
 
-    taskId = gtask->getTaskId();
-    state  = gtask->getTaskState();
+//    taskId = gtask->getTaskId();
+//    state  = gtask->getTaskState();
+    taskId = child->getTaskId();
+    state  = child->getTaskState();
+
 
     log->record(GreasyLog::devel, "GreasyTBBTaskContinuation::updateDependencies", "Inspecting reverse deps for task " + toString(taskId));
 
@@ -168,29 +167,30 @@ void GreasyTBBTaskContinuation::updateDependencies(GreasyTask* child_){
         return;
     }
 
+    GreasyTask* dependant;
     for(it=(*revDepMap)[taskId].begin() ; it!=(*revDepMap)[taskId].end();it++ ) {
 
-        // get the first child whose state is blocked
-        log->record(GreasyLog::devel, "GreasyTBBTaskContinuation::updateDependencies", "State of task " + toString(taskId) + " should be 'blocked' ?= " + toString(child->getTaskState()));
-        child = (*taskMap)[*it];
+        // get the first dependant whose state is blocked
+        log->record(GreasyLog::devel, "GreasyTBBTaskContinuation::updateDependencies", "State of task " + toString(taskId) + " should be 'blocked' ?= " + toString(dependant->getTaskState()));
+        dependant = (*taskMap)[*it];
 
 
       if (state == GreasyTask::completed) {
-        log->record(GreasyLog::devel, "GreasyTBBTaskContinuation::updateDependencies", "Remove dependency " + toString(taskId) + " from task " + toString(child->getTaskId()));
-        child->removeDependency(taskId);
-        if (!child->hasDependencies()) {
+        log->record(GreasyLog::devel, "GreasyTBBTaskContinuation::updateDependencies", "Remove dependency " + toString(taskId) + " from task " + toString(dependant->getTaskId()));
+        dependant->removeDependency(taskId);
+        if (!dependant->hasDependencies()) {
           log->record(GreasyLog::devel, "GreasyTBBTaskContinuation::updateDependencies", "Remove blocked state and queue task for execution");
-          child->setTaskState(GreasyTask::waiting);
+          dependant->setTaskState(GreasyTask::waiting);
         } else {
           log->record(GreasyLog::devel, "GreasyTBBTaskContinuation::updateDependencies", "The task still has dependencies, so leave it blocked");
         }
       }
       else if ((state == GreasyTask::failed)||(state == GreasyTask::cancelled)) {
-        log->record(GreasyLog::warning,  "Cancelling task " + toString(child->getTaskId()) + " because of task " + toString(taskId) + " failure");
+        log->record(GreasyLog::warning,  "Cancelling task " + toString(dependant->getTaskId()) + " because of task " + toString(taskId) + " failure");
         log->record(GreasyLog::devel, "GreasyTBBTaskContinuation::updateDependencies", "Parent failed: cancelling task and removing it from blocked");
-        child->setTaskState(GreasyTask::cancelled);
+        dependant->setTaskState(GreasyTask::cancelled);
 
-        updateDependencies(child);
+        updateDependencies(dependant);
       }
     }
 
@@ -225,7 +225,7 @@ tbb::task* GreasyTBBTaskContinuation::execute(){
 
                 set_ref_count( ++refcount );
 
-                GreasyLog::getInstance()->record(GreasyLog::debug, "GreasyTBBTaskLauncher::execute", "Allocating task ID = " + toString(gtask->getTaskId()) );
+                GreasyLog::getInstance()->record(GreasyLog::debug, "GreasyTBBTaskContinuation::execute", "Allocating task ID = " + toString(gtask->getTaskId()) );
 
                 // Start running the task.
                 spawn( a );
@@ -293,12 +293,13 @@ tbb::task* GreasyTBBTask::execute(){
 
            GreasyLog::getInstance()->record(GreasyLog::debug, "GreasyTBBTask::execute", "Executing command: " + gtask->getCommand());
 
-           start.now();
+           timer.reset();
+           timer.start();
            int retcode = system(gtask->getCommand().c_str());
-           end.now();
+           timer.stop();
 
            gtask->setReturnCode(retcode);
-           gtask->setElapsedTime( (end-start).seconds() );
+           gtask->setElapsedTime( timer.secsElapsed() );
 
            GreasyLog::getInstance()->record(GreasyLog::devel, "GreasyTBBTask::execute", "Exiting...");
 

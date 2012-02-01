@@ -1339,9 +1339,9 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
-  --enable-mpi-engine    enable MPI engine (default=no)
-  --enable-slurm-engine    enable SLURM engine
-  --enable-thread-engine    enable THREAD engine (not implemented yet)
+  --enable-mpi-engine			enable MPI engine (default=no)
+  --enable-slurm-engine			enable SLURM engine
+  --enable-thread-engine		enable THREAD engine. This option will compile a local distribution of TBB by default. If --with-tbb is set it will used the specified installation of TBB.
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -3727,7 +3727,8 @@ fi
 
 
 
-# Check for mpi
+# Checks for MPI-ENGINE
+
 # Check whether --enable-mpi-engine was given.
 if test "${enable_mpi_engine+set}" = set; then :
   enableval=$enable_mpi_engine; mpi_engine=${enableval}
@@ -5546,7 +5547,7 @@ fi
 done
 
 
-# Checks for other command line options
+# Checks for SLURM-ENGINE
 
 # Check whether --enable-slurm-engine was given.
 if test "${enable_slurm_engine+set}" = set; then :
@@ -5615,7 +5616,7 @@ fi
 
 fi
 
-#TODO: Implement checks for SLURM
+# Checks for THREAD-ENGINE
 
 # Check whether --enable-thread-engine was given.
 if test "${enable_thread_engine+set}" = set; then :

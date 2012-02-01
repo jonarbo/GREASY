@@ -199,7 +199,7 @@ greasy_SOURCES = abstractengine.cpp abstractengine.h \
 	$(am__append_5)
 @TBB_LOCAL_TRUE@@THREAD_ENGINE_TRUE@greasy_DEPENDENCIES = tbb 
 @TBB_LOCAL_TRUE@@THREAD_ENGINE_TRUE@tbb_root = $(CURDIR)/@my_tbb_root@
-@TBB_LOCAL_FALSE@@THREAD_ENGINE_TRUE@AM_LDFLAGS = -L@tbb_libs@ -ltbb 
+@TBB_LOCAL_FALSE@@THREAD_ENGINE_TRUE@AM_LDFLAGS = -R@tbb_libs@ -L@tbb_libs@ -ltbb 
 @TBB_LOCAL_TRUE@@THREAD_ENGINE_TRUE@AM_LDFLAGS = -L@my_tbb_root@/build/$(tbb_build_prefix)_release -ltbb 
 all: all-am
 
