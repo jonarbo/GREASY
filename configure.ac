@@ -63,6 +63,18 @@ AC_FUNC_FORK
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([getcwd gethostname gettimeofday regcomp])
 
+# Checks for Basic engine
+AC_CHECK_PROGS(basic_spawn, [srun ssh],[no])
+if test x$basic_spawn != xno; then
+  if test x$basic_spawn = xsrun; then 
+    AC_DEFINE(BASIC_SPAWN, srun, [Basic spawn method])
+  fi
+  if test x$basic_spawn = xssh; then 
+    AC_DEFINE(BASIC_SPAWN, ssh, [Basic spawn method])
+  fi
+fi
+
+
 # Checks for other command line options
 
 AC_ARG_ENABLE(slurm-engine,
