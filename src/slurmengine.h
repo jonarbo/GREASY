@@ -9,10 +9,10 @@
 #include "basicengine.h"
 
 /**
-  * This engine inherits AbstractSchedulerEngine, and implements a basic scheduler and launcher
-  * for Greasy using Slurm's srun
+  * This engine inherits AbstractEngine, and implements a scheduler and launcher
+  * for Greasy using an embeded Slurm
   */
-class SlurmEngine : public BasicEngine
+class SlurmEngine : public AbstractEngine
 {
   
 public:
@@ -25,14 +25,6 @@ public:
   
 
 protected:
-  
-  /**
-   * Run the command corresponding to a task using srun to spawn the process in the right place.
-   * @param task The task to be executed.
-   * @param worker The index of the worker in charge.
-   * @return The exit status of the command.
-   */  
-  virtual int executeTask(GreasyTask *task, int worker);
   
 };
 

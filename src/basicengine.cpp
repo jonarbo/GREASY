@@ -38,14 +38,19 @@ void BasicEngine::init() {
     }
     
     if (remote) {
-#if BASIC_SPAWN == srun
-      log->record(GreasyLog::debug,  "Using srun to spawn remote tasks");
-#elif BASIC_SPAWN == srun
-      log->record(GreasyLog::debug,  "Using ssh to spawn remote tasks");
-#else
-      log->record(GreasyLog::error,  "No Basic Spawner in the system. Please run greasy locally unsetting the NodeList Parameter");
-#endif    
-      
+      if (config->keyExists("BasicRemoteMethod")){
+	if (config->getValue("BasicRemoteMethod")=="srun") {
+	  log->record(GreasyLog::debug,  "Using srun to spawn remote tasks");
+	} else if (config->getValue("BasicRemoteMethod")=="ssh") {
+	  log->record(GreasyLog::debug,  "Using ssh to spawn remote tasks");
+	} else {
+	  log->record(GreasyLog::error,  "No Basic Spawner in the system. Please run greasy locally unsetting the NodeList Parameter");
+	  ready = false;
+	}
+      } else {
+	 log->record(GreasyLog::error,  "No Basic Remote method configured. Please run greasy locally unsetting the NodeList Parameter");
+	 ready = false;
+      }      
     }
 
   }
@@ -154,11 +159,14 @@ int BasicEngine::executeTask(GreasyTask *task, int worker) {
   } else {
     node = workerNodes[worker];
     if (!isLocalNode(node)) {
-      #if BASIC_SPAWN == srun
-	  command = "srun -n 1 -w " + node + " ";
-      #elif BASIC_SPAWN == ssh
+	if (config->getValue("BasicRemoteMethod")=="srun") {
+	  command = "srun -n 1 -N 1 -w " + node + " ";
+	} else if (config->getValue("BasicRemoteMethod")=="ssh") {
 	  command = "ssh " + node + " " ;
-      #endif
+	} else {
+	  // Should never be here
+	  log->record(GreasyLog::error, "Unknown error. Check BasicRemoteMethod parameter.");
+	} 
     }
   }
   

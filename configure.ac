@@ -64,29 +64,29 @@ AC_FUNC_FORK
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([getcwd gethostname gettimeofday regcomp])
 
-<<<<<<< HEAD
 # Checks for Basic engine
 AC_CHECK_PROGS(basic_spawn, [srun ssh],[no])
 if test x$basic_spawn != xno; then
   if test x$basic_spawn = xsrun; then 
-    AC_DEFINE(BASIC_SPAWN, srun, [Basic spawn method])
-  fi
-  if test x$basic_spawn = xssh; then 
-    AC_DEFINE(BASIC_SPAWN, ssh, [Basic spawn method])
+    AC_SUBST(remotemethod,[srun])
+  else
+    if test x$basic_spawn = xssh; then 
+      AC_SUBST(remotemethod,[ssh])
+    else
+      AC_SUBST(remotemethod,[none])
+    fi
   fi
 fi
 
 
-# Checks for other command line options
-=======
 # Checks for SLURM-ENGINE
->>>>>>> a1c479ebadfe4c94b14c68ec49637414c77da279
 
 AC_ARG_ENABLE(slurm-engine,
-  [  --enable-slurm-engine			enable SLURM engine],
+  [  --enable-slurm-engine			enable SLURM engine (Not yet implemented)],
   [slurm_engine=${enableval}],
   [slurm_engine=no])
 
+# WARNING: implement slurm engine before enabling in Makefile.am
 AM_CONDITIONAL(SLURM_ENGINE, test x$slurm_engine = xyes)
 
 if test x$slurm_engine = xyes; then
@@ -97,7 +97,8 @@ if test x$slurm_engine = xyes; then
     exit;
   fi
 
-  AC_SUBST(greasy_engine,[slurm])
+# TODO: implement slurm engine before enabling
+#   AC_SUBST(greasy_engine,[slurm])
 
 fi
 

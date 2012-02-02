@@ -6,8 +6,15 @@
 #########################################
 
 # Greasy engine to use.
-# Possible values: "basic", "mpi" or "slurm"
+# Possible values: "basic", "mpi" or "thread"
 Engine=@greasy_engine@
+
+
+# Remote spawn method for Basic Engine only
+# if not set, only local executions will be performed
+# Valid values are:
+# srun, ssh, none
+BasicRemoteMethod=@remotemethod@
 
 # Maximum number of retries for a failed task.
 # If not set, no retries will be done for a failed task.

@@ -32,19 +32,23 @@ FILE=short-example.txt
 # ./greasy.log
 ###########################################
 
+if [ -z "GREASY_LOGFILE" ]; then
+
 export GREASY_LOGFILE=greasy-$SLURM_JOBID.log
-export GREASY_LOGFILE=
-export GREASY_LOGLEVEL=5
+
+fi
 
 ##############################################
 # If running this script interactively, please
 # set the desired number of workers. The number
 # of workers should not be higher than the 
 # available cpus.
+# If remote spawning is available, set up the
+# comma-separated hostlist as well.
 ##############################################
 
 # export GREASY_NWORKERS=4
-
+# export GREASY_NODELIST=node1,node2,node3
 
 #################################
 #################################
@@ -67,9 +71,8 @@ else
 fi
 
 if [ -n "$SLURM_NPROCS" ]; then
-  echo "Inside a job, match slurm and greasy variables"
-  GREASY_NWORKERS=$SLURM_NPROCS
-  GREASY_NODELIST=`srun hostname | tr "\n" ","`
+  export GREASY_NWORKERS=$SLURM_NPROCS
+  export GREASY_NODELIST=`srun hostname | tr "\n" ","`
 fi
 
 # Run Greasy

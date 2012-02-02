@@ -6,20 +6,12 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-SlurmEngine::SlurmEngine ( const string& filename) : BasicEngine(filename){
+SlurmEngine::SlurmEngine ( const string& filename) : AbstractEngine(filename){
   
   engineType="slurm";
   
 }
 
-int SlurmEngine::executeTask(GreasyTask *task, int worker) {
-  
-  string command = "srun -n1 " + task->getCommand();
-  log->record(GreasyLog::devel,  "SlurmEngine::allocate[" + toString(worker) +"]", "Task " 
-		      + toString(task->getTaskId()) + " command: " + command);
-  return system(command.c_str());
-  
-}
 
 
 

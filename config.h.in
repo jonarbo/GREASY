@@ -1,8 +1,5 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Basic spawn method */
-#undef BASIC_SPAWN
-
 /* Define to 1 if you have the `fork' function. */
 #undef HAVE_FORK
 
