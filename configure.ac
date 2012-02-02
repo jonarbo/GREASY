@@ -12,9 +12,10 @@ AC_SUBST(greasy_engine,[basic])
 # Checks for programs.
 AC_PROG_CC
 
-# Check for mpi
+# Checks for MPI-ENGINE
+
 AC_ARG_ENABLE(mpi-engine,
-  [  --enable-mpi-engine    enable MPI engine (default=no)],
+  [  --enable-mpi-engine			enable MPI engine (default=no)],
   [mpi_engine=${enableval}],
   [mpi_engine=no])
 
@@ -63,6 +64,7 @@ AC_FUNC_FORK
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([getcwd gethostname gettimeofday regcomp])
 
+<<<<<<< HEAD
 # Checks for Basic engine
 AC_CHECK_PROGS(basic_spawn, [srun ssh],[no])
 if test x$basic_spawn != xno; then
@@ -76,9 +78,12 @@ fi
 
 
 # Checks for other command line options
+=======
+# Checks for SLURM-ENGINE
+>>>>>>> a1c479ebadfe4c94b14c68ec49637414c77da279
 
 AC_ARG_ENABLE(slurm-engine,
-  [  --enable-slurm-engine    enable SLURM engine],
+  [  --enable-slurm-engine			enable SLURM engine],
   [slurm_engine=${enableval}],
   [slurm_engine=no])
 
@@ -96,10 +101,10 @@ if test x$slurm_engine = xyes; then
 
 fi
 
-#TODO: Implement checks for SLURM
+# Checks for THREAD-ENGINE
 
 AC_ARG_ENABLE(thread-engine,
-  [  --enable-thread-engine    enable THREAD engine (not implemented yet)],
+  [  --enable-thread-engine		enable THREAD engine. This option will compile a local distribution of TBB by default. If --with-tbb is set it will used the specified installation of TBB.],
   [thread_engine=${enableval}],
   [thread_engine=no])
 

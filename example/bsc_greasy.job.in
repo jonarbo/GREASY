@@ -33,6 +33,8 @@ FILE=short-example.txt
 ###########################################
 
 export GREASY_LOGFILE=greasy-$SLURM_JOBID.log
+export GREASY_LOGFILE=
+export GREASY_LOGLEVEL=5
 
 ##############################################
 # If running this script interactively, please
@@ -65,7 +67,9 @@ else
 fi
 
 if [ -n "$SLURM_NPROCS" ]; then
+  echo "Inside a job, match slurm and greasy variables"
   GREASY_NWORKERS=$SLURM_NPROCS
+  GREASY_NODELIST=`srun hostname | tr "\n" ","`
 fi
 
 # Run Greasy

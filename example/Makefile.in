@@ -129,6 +129,7 @@ am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
+basic_spawn = @basic_spawn@
 bindir = @bindir@
 build_alias = @build_alias@
 builddir = @builddir@

@@ -19,23 +19,33 @@
 #include <time.h>
 
 AbstractEngine* AbstractEngineFactory::getAbstractEngineInstance(const string& filename, const string& type ) {
+  
+ GreasyLog::getInstance()->record(GreasyLog::devel, "AbstractEngineInstance::getAbstractEngineInstance", "Entering with type: '" + type+"'");
 
-  if (type == "basic" || type.empty() )
-      return new BasicEngine(filename);
+  if (type == "basic" || type.empty() ){
+ 	GreasyLog::getInstance()->record(GreasyLog::devel, "AbstractEngineInstance::getAbstractEngineInstance", "Creating engine type: 'basic'");
+	return new BasicEngine(filename);
+  }
 
   #ifdef MPI_ENGINE
-  if (type == "mpi")
-      return new MPIEngine(filename);
+  if (type == "mpi"){
+ 	GreasyLog::getInstance()->record(GreasyLog::devel, "AbstractEngineInstance::getAbstractEngineInstance", "Creating engine type: 'mpi'");
+        return new MPIEngine(filename);
+	}
   #endif
 
   #ifdef SLURM_ENGINE
-  if (type == "slurm")
-      return new SlurmEngine(filename);
+  if (type == "slurm"){
+ 	GreasyLog::getInstance()->record(GreasyLog::devel, "AbstractEngineInstance::getAbstractEngineInstance", "Creating engine type: 'slurm'");
+        return new SlurmEngine(filename);
+	}
   #endif
 
   #ifdef THREAD_ENGINE
-  if (type == "thread")
-      return new ThreadEngine(filename);
+  if (type == "thread"){ 
+ 	GreasyLog::getInstance()->record(GreasyLog::devel, "AbstractEngineInstance::getAbstractEngineInstance", "Creating engine type: 'thread'");
+        return new ThreadEngine(filename);
+	}
   #endif
 
   GreasyLog::getInstance()->record(GreasyLog::error, "Wrong engine type requested!!! This version does not supports '" + type + "' scheduler");

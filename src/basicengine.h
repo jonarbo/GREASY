@@ -24,6 +24,11 @@ public:
   BasicEngine (const string& filename ); 
   
   /**
+   * Perform the initialization of the engine and the MPI environment.
+   */
+  virtual void init();
+  
+  /**
    * Execute the engine. It is divided into 2 different parts, for master and workers.
    */
   virtual void run();
@@ -51,9 +56,25 @@ protected:
    */  
   virtual int executeTask(GreasyTask *task, int worker);
   
+  /**
+   * Checks if a given node is the local node.
+   * @param task The node to be checked.
+   * @return True if local node, false otherwise.
+   */  
+  bool isLocalNode(string node);
+
+  /**
+   * Get the name of the node where the worker is asigned.
+   * @param task The worker id.
+   * @return the string containing the node name.
+   */  
+  string getWorkerNode(int worker);
+  
   map<pid_t,int> pidToWorker; /**<  Map to translate a pid to the corresponding worker. */
   map<int, GreasyTimer> workerTimers; /**<  Map of worker timers to know elapsed time of tasks. */
-  char hostname[HOST_NAME_MAX]; ///< Cstring to hold the worker hostname.
+  map<int, string> workerNodes; /**<  Map of worker nodes to know in which node to send each worker's tasks. */
+  string masterHostname; ///< String to hold the master hostname.
+  bool remote; ///< Flag to know whether the engine will need to do remote tasks.
 };
 
 #endif // BASICENGINE_H

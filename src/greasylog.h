@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include "greasyutils.h"
+#include "config.h"
 
 using namespace std;
 
