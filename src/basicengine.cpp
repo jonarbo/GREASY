@@ -116,20 +116,19 @@ void BasicEngine::waitForAnyWorker() {
   int worker;
   pid_t pid;
   int status;
-  int maxRetries=0;
   GreasyTask* task = NULL;
   
   log->record(GreasyLog::devel, "BasicEngine::waitForAnyWorker", "Entering...");
-  
-  if (config->keyExists("MaxRetries")) fromString(maxRetries, config->getValue("MaxRetries"));
-  
+
+  // Wait for any of the worker to finish
   log->record(GreasyLog::debug,  "Waiting for any task to complete...");
   pid = wait(&status);
-
+  
+  // Identify the worker that was in charge of the child
+  worker = pidToWorker[pid];
+  
   // Get the return code
   if (WIFEXITED(status)) retcode = WEXITSTATUS(status);
-
-  worker = pidToWorker[pid];
     
   // Push worker to the free workers queue again
   freeWorkers.push(worker);
@@ -142,6 +141,7 @@ void BasicEngine::waitForAnyWorker() {
   task->setHostname(getWorkerNode(worker));
   task->setHostname(masterHostname);
 
+  // Run task epilogue stuff
   taskEpilogue(task);
   
   log->record(GreasyLog::devel, "BasicEngine::waitForAnyWorker", "Exiting...");
@@ -153,6 +153,7 @@ int BasicEngine::executeTask(GreasyTask *task, int worker) {
   log->record(GreasyLog::devel, "BasicEngine::executeTask["+toString(worker) +"]", "Entering..."); 
   string command = "";
   string node = "";
+  int ret;
 
   if (!remote) {
     node = masterHostname;
@@ -173,7 +174,9 @@ int BasicEngine::executeTask(GreasyTask *task, int worker) {
   command += task->getCommand();
   log->record(GreasyLog::devel,  "BasicEngine::executeTask[" + toString(worker) +"]", "Task " 
 		      + toString(task->getTaskId()) + " on node " + node + " command: " + command);
-  int ret =  system(command.c_str());
+  ret =  system(command.c_str());
+  ret = WEXITSTATUS(ret);
+  log->record(GreasyLog::devel, "BasicEngine::executeTask["+toString(worker) +"]", "Task returned "+toString(ret)); 
   log->record(GreasyLog::devel, "BasicEngine::executeTask["+toString(worker) +"]", "Exiting..."); 
   return ret;
   
