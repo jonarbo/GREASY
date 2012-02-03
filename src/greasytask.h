@@ -68,7 +68,13 @@ public:
    * @return the state as int, but corresponding to the enum TaskStates.
    */
   int getTaskState();
-  
+
+  /**
+   * Prints the the state of the task in a human readable form.
+   * @return a string whith the task state
+   */
+  string printTaskState();
+
   /**
    * Check if the task is blocked (because a dependency is not fulfilled).
    * @return true if the task is blocked.

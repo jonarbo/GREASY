@@ -6,8 +6,8 @@
 
 #include "tbb/tbb.h"
 #include "tbb/task.h"
-//#include "tbb/tick_count.h"
 #include "tbb/task_scheduler_init.h"
+#include "tbb/parallel_do.h"
 
 /**
   * This engine inherits AbstractEngine, and implements a Threaded scheduler for Greasy.
@@ -76,103 +76,36 @@ protected:
 /***  TBB-related classes
 /*************************************************************************************/
 
-// forward declarations
-class GreasyTBBTaskContinuation;
-class GreasyTBBTask;
-class GreasyTBBTaskLauncher;
-
 /**
   * This class wraps a task as seen from the TBB task scheduler.
-  * It is a 'continuation' class... see TBB documentation to get more info on it.
-  * It basically allows a parent tasks to continue while the childs are still running
-  * to increase efficiency.
+  * This is the class that is called from the parallel_do and inspect
+  * and launch the dependencies if needed.
   */
-class GreasyTBBTaskContinuation: public tbb::task{
+class GreasyTBBTaskEngine {
 
-public:
+    public:
 
-    /**
-      * Constructor
-      **/
-    GreasyTBBTaskContinuation(GreasyTask* gtask_, map<int,GreasyTask*> * taskMap_ , map<int,list<int> >* revDepMap_);
+        /**
+          * Constructor
+          **/
+        GreasyTBBTaskEngine(map<int,GreasyTask*> * taskMap_, set<int>* validTasks_ ,map<int,list<int> >*revDepMap_ );
 
-    /**
-     * All the checks after a task finishes are done here, updating task and engine metadata.
-     */
-    bool taskEpilogue();
+        typedef GreasyTask* argument_type; // typedef for function object
 
-    /**
-     * Update all the tasks depending for the current task which has finished.
-     *
-     */
-    void updateDependencies(GreasyTask* child_ );
+        /**
+          * Core: Overloading this operator makes parallel_do perform it for each value in the loop.
+          * We later on dispatch dependant children as needed.
+          */
+        void operator()( argument_type item, tbb::parallel_do_feeder<argument_type>& feed_it) const ;
 
-    /**
-      * Core function that should be implemented in thr TBB task model.
-      *
-      */
-    task* execute();
+    protected:
 
-protected:
+        map<int,GreasyTask*> * taskMap;
+        set<int>* validTasks;
+        map<int,list<int> >*revDepMap;
 
-    GreasyTask* const gtask;
-    map<int,GreasyTask*> * const taskMap;
-    map<int,list<int> >* const revDepMap;
-
+        bool taskEpilogue(argument_type gtask, tbb::parallel_do_feeder<argument_type>& feed_it ) const;
+        void updateDependencies(argument_type child, tbb::parallel_do_feeder<argument_type>& feed_it) const;
 };
-
-/**
-  * This class wraps a task as seen from the TBB task scheduler.
-  * This is the class that is responsible start the scheduler and launch
-  * all the tasks.
-  */
-class GreasyTBBTaskLauncher: public tbb::task{
-
-public:
-
-    /**
-      * Constructor
-      **/
-    GreasyTBBTaskLauncher( map<int,GreasyTask*> * taskMap_, set<int>* validTasks_ ,map<int,list<int> >*revDepMap_ );
-
-    /**
-      * Core function that should be implemented in the TBB task model.
-      */
-    task* execute();
-
-protected:
-
-    map<int,GreasyTask*> * const taskMap;
-    map<int,list<int> >* const revDepMap;
-    set<int>* const validTasks;
-    int reference_count;
-
-};
-
-/**
-  * This class wraps a task as seen from the TBB task scheduler.
-  * This is the class that is responsible to spawn the child tasks,
-  * creating a tree-like structure as recommended in the TBB documentation.
-  */
-class GreasyTBBTask: public tbb::task {
-
-public:
-
-    /**
-      * Constructor
-      **/
-    GreasyTBBTask(GreasyTask* gtask_ );
-
-    /**
-      * Core function that should be implemented in thr TBB task model
-      */
-    task* execute();
-
-protected:
-
-    GreasyTask* const gtask;
-    GreasyTimer timer;
-};
-
 
 #endif // THREADENGINE_H

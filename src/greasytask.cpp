@@ -62,6 +62,38 @@ int GreasyTask::getTaskState() {
   
 }
 
+string GreasyTask::printTaskState(){
+
+    string x = "Unknown";
+
+    switch ( taskState ){
+        case 0:
+                x = "invalid";
+                return x;
+        case 1:
+                x="blocked";
+                return x;
+        case 2:
+                x="waiting";
+                return x;
+        case 3:
+                x="running";
+                return x;
+        case 4:
+                x="completed";
+                return x;
+        case 5:
+                x="failed";
+                return x;
+        case 6:
+                x="canceled";
+                return x;
+    default:
+            return x;
+    }
+}
+
+
 bool GreasyTask::isBlocked() {
  
   return (taskState==GreasyTask::blocked);

@@ -65,19 +65,30 @@ void ThreadEngine::runScheduler(){
   // initialize the task scheduler
   tbb::task_scheduler_init init(nworkers) ;
 
+  log->record(GreasyLog::debug, "ThreadEngine::runScheduler", "Starting to launch tasks...");
+
+  set<int>::iterator it;
+  GreasyTask* gtask  = NULL;
+  vector<GreasyTask*> runnableTasks;
+
+  for ( it=validTasks.begin(); it!=validTasks.end(); it++ ) {
+      gtask = taskMap[*it];
+      GreasyLog::getInstance()->record(GreasyLog::debug, "ThreadEngine::runScheduler", "Task "+ toString(gtask->getTaskId())+" state is '"+ gtask->printTaskState() +"'");
+      if ( gtask->isWaiting() ){
+          GreasyLog::getInstance()->record(GreasyLog::debug, "ThreadEngine::runScheduler", "Scheduling task "+ toString(gtask->getTaskId()) );
+          runnableTasks.push_back(gtask);
+      }
+  }
+
   // start counter
   globalTimer.start();
 
-  log->record(GreasyLog::debug, "ThreadEngine::runScheduler", "Starting to launch tasks...");
-
-  // fill the TBB task queue ... launch scheduler
-  GreasyTBBTaskLauncher& a = *new(tbb::task::allocate_root()) GreasyTBBTaskLauncher(&taskMap,&validTasks,&revDepMap);
-  tbb::task::spawn_root_and_wait(a);
-
-  log->record(GreasyLog::debug, "ThreadEngine::runScheduler", "All tasks lauched");
+  tbb::parallel_do (runnableTasks.begin(), runnableTasks.end(),GreasyTBBTaskEngine(&taskMap,&validTasks,&revDepMap) );
 
   // end counter
   globalTimer.stop();
+
+  log->record(GreasyLog::debug, "ThreadEngine::runScheduler", "All tasks lauched");
 
   log->record(GreasyLog::devel, "ThreadEngine::runScheduler", "Exiting...");
 }
@@ -87,19 +98,52 @@ void ThreadEngine::runScheduler(){
 /*************************************************************************************/
 
 /***********************************/
-/***   GreasyTBBTaskContinuation
+/***   GreasyTBBTaskEngine
 /***********************************/
 
-GreasyTBBTaskContinuation::GreasyTBBTaskContinuation (GreasyTask* gtask_, map<int,GreasyTask*> * taskMap_ , map<int,list<int> >* revDepMap_)
-    : gtask(gtask_), taskMap(taskMap_),revDepMap(revDepMap_)
+GreasyTBBTaskEngine::GreasyTBBTaskEngine(map<int,GreasyTask*> * taskMap_, set<int>* validTasks_ ,map<int,list<int> >*revDepMap_ )
+    : taskMap(taskMap_), validTasks(validTasks_),revDepMap(revDepMap_)
 {;}
 
-bool GreasyTBBTaskContinuation::taskEpilogue(){
+
+void GreasyTBBTaskEngine::operator()( argument_type item, tbb::parallel_do_feeder<argument_type>& feed_it) const
+{
+    GreasyLog::getInstance()->record(GreasyLog::devel, "GreasyTBBTaskEngine::()", "Entering...");
+
+    GreasyLog::getInstance()->record(GreasyLog::debug, "GreasyTBBTaskEngine::()", "Executing command: " + item->getCommand());
+
+    item->setTaskState(GreasyTask::running);
+
+    GreasyTimer timer;
+    timer.reset();
+    timer.start();
+    int retcode = system(item->getCommand().c_str());
+    timer.stop();
+
+    item->setReturnCode(retcode);
+    item->setElapsedTime( timer.secsElapsed() );
+
+    // task is finished here ...
+    if (!taskEpilogue(item, feed_it) )
+    {
+        // task ended Ok ...
+        GreasyLog::getInstance()->record(GreasyLog::devel, "GreasyTBBTaskEngine::()", "Task "+  toString(item->getTaskId()) +" ended Ok"  );
+    }else{
+        // task failed ...
+        GreasyLog::getInstance()->record(GreasyLog::devel, "GreasyTBBTaskEngine::()", "Task "+  toString(item->getTaskId()) +" failed"  );
+    }
+
+    GreasyLog::getInstance()->record(GreasyLog::devel, "GreasyTBBTaskEngine::()", "Exiting...");
+}
+
+
+bool GreasyTBBTaskEngine::taskEpilogue(argument_type gtask, tbb::parallel_do_feeder<argument_type>& feed_it ) const
+{
 
     int maxRetries=0;
     bool retval = false;
 
-    GreasyLog::getInstance()->record(GreasyLog::devel, "GreasyTBBTaskContinuation::taskEpilogue", "Entering...");
+    GreasyLog::getInstance()->record(GreasyLog::devel, "GreasyTBBTaskEngine::taskEpilogue", "Entering...");
 
     if ( GreasyConfig::getInstance()->keyExists("MaxRetries")) fromString(maxRetries, GreasyConfig::getInstance()->getValue("MaxRetries"));
 
@@ -112,58 +156,44 @@ bool GreasyTBBTaskContinuation::taskEpilogue(){
         gtask->addRetryAttempt();
 
         // allocate task again...
-
-        // first create a 'continuation' task to free this thread when finished
-        GreasyTBBTaskContinuation& c = *new(allocate_continuation()) GreasyTBBTaskContinuation(gtask,taskMap,revDepMap) ;
-        // can be allocated inmediatelly, so create child
-        GreasyTBBTask& a = *new( c.allocate_child() ) GreasyTBBTask( gtask );
-
-        set_ref_count( 1 );
-
-        spawn(a);
-
+        GreasyLog::getInstance()->record(GreasyLog::debug,  "Allocating again task " + toString(gtask->getTaskId()) + " retry attempt: " + toString(gtask->getRetries()) );
+        feed_it.add(gtask);
         retval= true;
 
       } else {
         gtask->setTaskState(GreasyTask::failed);
-
-        updateDependencies(gtask);
-
+        updateDependencies(gtask,feed_it);
       }
     } else {
       GreasyLog::getInstance()->record(GreasyLog::info,  "Task " + toString(gtask->getTaskId()) + " completed successfully. Elapsed: " +  GreasyTimer::secsToTime(gtask->getElapsedTime()));
       gtask->setTaskState(GreasyTask::completed);
 
-      updateDependencies(gtask);
+      updateDependencies(gtask, feed_it);
 
     }
 
-    GreasyLog::getInstance()->record(GreasyLog::devel, "GreasyTBBTaskContinuation::taskEpilogue", "Exiting...");
+    GreasyLog::getInstance()->record(GreasyLog::devel, "GreasyTBBTaskEngine::taskEpilogue", "Exiting...");
 
     return retval;
-
 }
 
-void GreasyTBBTaskContinuation::updateDependencies(GreasyTask* child_){
+void GreasyTBBTaskEngine::updateDependencies(argument_type child, tbb::parallel_do_feeder<argument_type>& feed_it) const
+{
 
     int taskId, state;
-    GreasyTask* child = child_;
     list<int>::iterator it;
     GreasyLog* log =  GreasyLog::getInstance();
 
-    log->record(GreasyLog::devel, "GreasyTBBTaskContinuation::updateDependencies", "Entering...");
+    log->record(GreasyLog::devel, "GreasyTBBTaskEngine::updateDependencies", "Entering...");
 
-//    taskId = gtask->getTaskId();
-//    state  = gtask->getTaskState();
     taskId = child->getTaskId();
     state  = child->getTaskState();
 
-
-    log->record(GreasyLog::devel, "GreasyTBBTaskContinuation::updateDependencies", "Inspecting reverse deps for task " + toString(taskId));
+    log->record(GreasyLog::devel, "GreasyTBBTaskEngine::updateDependencies", "Inspecting reverse deps for task " + toString(taskId));
 
     if ( revDepMap->find(taskId) == revDepMap->end() ){
-        log->record(GreasyLog::devel, "GreasyTBBTaskContinuation::updateDependencies", "The task "+ toString(taskId) + " does not have any other dependendant task. No update done.");
-        log->record(GreasyLog::devel, "GreasyTBBTaskContinuation::updateDependencies", "Exiting...");
+        log->record(GreasyLog::devel, "GreasyTBBTaskEngine::updateDependencies", "The task "+ toString(taskId) + " does not have any other dependendant task. No update done.");
+        log->record(GreasyLog::devel, "GreasyTBBTaskEngine::updateDependencies", "Exiting...");
         return;
     }
 
@@ -171,138 +201,35 @@ void GreasyTBBTaskContinuation::updateDependencies(GreasyTask* child_){
     for(it=(*revDepMap)[taskId].begin() ; it!=(*revDepMap)[taskId].end();it++ ) {
 
         // get the first dependant whose state is blocked
-        log->record(GreasyLog::devel, "GreasyTBBTaskContinuation::updateDependencies", "State of task " + toString(taskId) + " should be 'blocked' ?= " + toString(dependant->getTaskState()));
         dependant = (*taskMap)[*it];
-
+        log->record(GreasyLog::devel, "GreasyTBBTaskEngine::updateDependencies", "State of dependant task " + toString(dependant->getTaskId()) + " is " +  dependant->printTaskState() );
 
       if (state == GreasyTask::completed) {
-        log->record(GreasyLog::devel, "GreasyTBBTaskContinuation::updateDependencies", "Remove dependency " + toString(taskId) + " from task " + toString(dependant->getTaskId()));
+        log->record(GreasyLog::devel, "GreasyTBBTaskEngine::updateDependencies", "Remove dependency " + toString(taskId) + " from task " + toString(dependant->getTaskId()));
         dependant->removeDependency(taskId);
         if (!dependant->hasDependencies()) {
-          log->record(GreasyLog::devel, "GreasyTBBTaskContinuation::updateDependencies", "Remove blocked state and queue task for execution");
-          dependant->setTaskState(GreasyTask::waiting);
+            log->record(GreasyLog::devel, "GreasyTBBTaskEngine::updateDependencies", "Dependant task "+ toString(dependant->getTaskId()) + " new state is: '"+ dependant->printTaskState()+"'");
+
+            if (dependant->getTaskState() == GreasyTask::waiting ){
+                GreasyLog::getInstance()->record(GreasyLog::debug,  "Allocating task " + toString(dependant->getTaskId())) ;
+                feed_it.add(dependant);
+            }
+
         } else {
-          log->record(GreasyLog::devel, "GreasyTBBTaskContinuation::updateDependencies", "The task still has dependencies, so leave it blocked");
+            log->record(GreasyLog::devel, "GreasyTBBTaskEngine::updateDependencies", "The task still has dependencies, so leave its state '" + dependant->printTaskState() +"'" );
         }
       }
       else if ((state == GreasyTask::failed)||(state == GreasyTask::cancelled)) {
         log->record(GreasyLog::warning,  "Cancelling task " + toString(dependant->getTaskId()) + " because of task " + toString(taskId) + " failure");
-        log->record(GreasyLog::devel, "GreasyTBBTaskContinuation::updateDependencies", "Parent failed: cancelling task and removing it from blocked");
+        log->record(GreasyLog::devel, "GreasyTBBTaskEngine::updateDependencies", "Parent failed: cancelling task and removing it from blocked");
         dependant->setTaskState(GreasyTask::cancelled);
 
-        updateDependencies(dependant);
+        updateDependencies(dependant,feed_it);
       }
     }
 
-    log->record(GreasyLog::devel, "GreasyTBBTaskContinuation::updateDependencies", "Exiting...");
+    log->record(GreasyLog::devel, "GreasyTBBTaskEngine::updateDependencies", "Exiting...");
 
 }
 
-tbb::task* GreasyTBBTaskContinuation::execute(){
-
-    GreasyLog::getInstance()->record(GreasyLog::devel, "GreasyTBBTaskContinuation::execute", "Entering...");
-
-    // task is finished here ...
-    if (!taskEpilogue() )
-    {
-        // task ended Ok ...
-
-        // now see if it has dependants
-        list<int> depList = gtask->getDependencies();
-        list<int>::iterator it;
-        GreasyTask* ngtask;
-        int refcount = 0;
-        for ( it=depList.begin(); it!=depList.end(); it++ )
-        {
-            ngtask = (*taskMap)[*it];
-            if ( ngtask->isWaiting() ){
-
-                // first create a 'continuation' task to free this thread when finished
-                GreasyTBBTaskContinuation& c = *new(allocate_continuation()) GreasyTBBTaskContinuation(ngtask,taskMap,revDepMap) ;
-
-                // can be allocated inmediatelly, so create child
-                GreasyTBBTask& a = *new( c.allocate_child() ) GreasyTBBTask( ngtask );
-
-                set_ref_count( ++refcount );
-
-                GreasyLog::getInstance()->record(GreasyLog::debug, "GreasyTBBTaskContinuation::execute", "Allocating task ID = " + toString(gtask->getTaskId()) );
-
-                // Start running the task.
-                spawn( a );
-             }
-
-        }
-    }
-
-    GreasyLog::getInstance()->record(GreasyLog::devel, "GreasyTBBTaskContinuation::execute", "Exiting...");
-    return NULL;
-
-}
-
-/***********************************/
-/***   GreasyTBBTaskLauncher
-/***********************************/
-
-GreasyTBBTaskLauncher::GreasyTBBTaskLauncher( map<int,GreasyTask*> * taskMap_, set<int>* validTasks_ ,map<int,list<int> >*revDepMap_)
-    :taskMap(taskMap_), validTasks(validTasks_), revDepMap(revDepMap_), reference_count(0)
-{;}
-
-tbb::task* GreasyTBBTaskLauncher::execute(){
-
-    GreasyLog::getInstance()->record(GreasyLog::devel, "GreasyTBBTaskLauncher::execute", "Entering...");
-
-    set<int>::iterator it;
-    GreasyTask* gtask  = NULL;
-
-    for ( it=validTasks->begin(); it!=validTasks->end(); it++ ) {
-      gtask = (*taskMap)[*it];
-      if ( gtask->isWaiting() ){
-
-          // first create a 'continuation' task to free this thread when finished
-          GreasyTBBTaskContinuation& c = *new(allocate_continuation()) GreasyTBBTaskContinuation(gtask,taskMap,revDepMap) ;
-
-          // can be allocated inmediatelly, so create child
-          GreasyTBBTask& a = *new( c.allocate_child() ) GreasyTBBTask( gtask );
-
-          set_ref_count( ++reference_count );
-
-          GreasyLog::getInstance()->record(GreasyLog::debug, "GreasyTBBTaskLauncher::execute", "Allocating task ID = " + toString(gtask->getTaskId()) );
-
-          // Start running the task.
-          spawn( a );
-       }
-    }
-
-    GreasyLog::getInstance()->record(GreasyLog::devel, "GreasyTBBTaskLauncher::execute", "Exiting...");
-    return NULL;
-}
-
-
-/***********************************/
-/***   GreasyTBBTask
-/***********************************/
-
-GreasyTBBTask::GreasyTBBTask(GreasyTask* gtask_)
-    :gtask(gtask_)
-{;}
-
-tbb::task* GreasyTBBTask::execute(){
-           // Overrides virtual function task::execute
-
-           GreasyLog::getInstance()->record(GreasyLog::devel, "GreasyTBBTask::execute", "Entering...");
-
-           GreasyLog::getInstance()->record(GreasyLog::debug, "GreasyTBBTask::execute", "Executing command: " + gtask->getCommand());
-
-           timer.reset();
-           timer.start();
-           int retcode = system(gtask->getCommand().c_str());
-           timer.stop();
-
-           gtask->setReturnCode(retcode);
-           gtask->setElapsedTime( timer.secsElapsed() );
-
-           GreasyLog::getInstance()->record(GreasyLog::devel, "GreasyTBBTask::execute", "Exiting...");
-
-           return NULL;
-}
 
