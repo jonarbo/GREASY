@@ -32,12 +32,12 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = greasy$(EXEEXT)
+bin_PROGRAMS = greasybin$(EXEEXT)
 @MPI_ENGINE_TRUE@am__append_1 = mpiengine.cpp mpiengine.h
 @MPI_ENGINE_TRUE@am__append_2 = -DMPI_ENGINE
 
 # if SLURM_ENGINE
-# greasy_SOURCES += slurmengine.cpp slurmengine.h 
+# greasybin_SOURCES += slurmengine.cpp slurmengine.h 
 # AM_CPPFLAGS += -DSLURM_ENGINE
 # endif
 @THREAD_ENGINE_TRUE@am__append_3 = threadengine.cpp threadengine.h 
@@ -55,7 +55,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am__greasy_SOURCES_DIST = abstractengine.cpp abstractengine.h \
+am__greasybin_SOURCES_DIST = abstractengine.cpp abstractengine.h \
 	abstractschedulerengine.cpp abstractschedulerengine.h \
 	basicengine.cpp basicengine.h greasyconfig.cpp greasyconfig.h \
 	greasy.cpp greasylog.cpp greasylog.h greasyregex.cpp \
@@ -64,13 +64,13 @@ am__greasy_SOURCES_DIST = abstractengine.cpp abstractengine.h \
 	threadengine.cpp threadengine.h
 @MPI_ENGINE_TRUE@am__objects_1 = mpiengine.$(OBJEXT)
 @THREAD_ENGINE_TRUE@am__objects_2 = threadengine.$(OBJEXT)
-am_greasy_OBJECTS = abstractengine.$(OBJEXT) \
+am_greasybin_OBJECTS = abstractengine.$(OBJEXT) \
 	abstractschedulerengine.$(OBJEXT) basicengine.$(OBJEXT) \
 	greasyconfig.$(OBJEXT) greasy.$(OBJEXT) greasylog.$(OBJEXT) \
 	greasyregex.$(OBJEXT) greasytask.$(OBJEXT) \
 	greasytimer.$(OBJEXT) $(am__objects_1) $(am__objects_2)
-greasy_OBJECTS = $(am_greasy_OBJECTS)
-greasy_LDADD = $(LDADD)
+greasybin_OBJECTS = $(am_greasybin_OBJECTS)
+greasybin_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -84,8 +84,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(greasy_SOURCES)
-DIST_SOURCES = $(am__greasy_SOURCES_DIST)
+SOURCES = $(greasybin_SOURCES)
+DIST_SOURCES = $(am__greasybin_SOURCES_DIST)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -182,7 +182,6 @@ remotemethod = @remotemethod@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
-srun_present = @srun_present@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 tbb_include = @tbb_include@
@@ -192,13 +191,13 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -DSYSTEM_CFG=\"@sysconfdir@/greasy.conf\" \
 	$(am__append_2) $(am__append_4) $(am__append_5)
-greasy_SOURCES = abstractengine.cpp abstractengine.h \
+greasybin_SOURCES = abstractengine.cpp abstractengine.h \
 	abstractschedulerengine.cpp abstractschedulerengine.h \
 	basicengine.cpp basicengine.h greasyconfig.cpp greasyconfig.h \
 	greasy.cpp greasylog.cpp greasylog.h greasyregex.cpp \
 	greasyregex.h greasytask.cpp greasytask.h greasytimer.cpp \
 	greasytimer.h greasyutils.h $(am__append_1) $(am__append_3)
-@TBB_LOCAL_TRUE@@THREAD_ENGINE_TRUE@greasy_DEPENDENCIES = tbb 
+@TBB_LOCAL_TRUE@@THREAD_ENGINE_TRUE@greasybin_DEPENDENCIES = tbb 
 @TBB_LOCAL_TRUE@@THREAD_ENGINE_TRUE@tbb_root = $(CURDIR)/@my_tbb_root@
 @TBB_LOCAL_FALSE@@THREAD_ENGINE_TRUE@AM_LDFLAGS = -R@tbb_libs@ -L@tbb_libs@ -ltbb 
 @TBB_LOCAL_TRUE@@THREAD_ENGINE_TRUE@AM_LDFLAGS = -L@my_tbb_root@/build/$(tbb_build_prefix)_release -ltbb 
@@ -273,9 +272,9 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-greasy$(EXEEXT): $(greasy_OBJECTS) $(greasy_DEPENDENCIES) 
-	@rm -f greasy$(EXEEXT)
-	$(CXXLINK) $(greasy_OBJECTS) $(greasy_LDADD) $(LIBS)
+greasybin$(EXEEXT): $(greasybin_OBJECTS) $(greasybin_DEPENDENCIES) 
+	@rm -f greasybin$(EXEEXT)
+	$(CXXLINK) $(greasybin_OBJECTS) $(greasybin_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

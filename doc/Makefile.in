@@ -161,7 +161,6 @@ remotemethod = @remotemethod@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
-srun_present = @srun_present@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 tbb_include = @tbb_include@

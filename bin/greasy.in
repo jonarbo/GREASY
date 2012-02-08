@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# Some setup parameters
+GREASY_BINDIR=@greasy_bindir@
+GREASY_CONFDIR=@greasy_etcdir@
+EXE=$GREASY_BINDIR/greasybin
+
+# Check if the script is launched using any kind of spawner
+COMMAND=`echo $_ | cut -d" " -f1 | rev | cut -d"/" -f1 |  rev`
+
+if [ "$COMMAND" != "greasy" ]; then
+  echo "Usage: greasy <taskfile.txt>"
+  echo "Please rerun greasy without putting $COMMAND before"
+  exit
+fi
+
+# Decide which type of launcher to use depending on the engine selected.
+if [ -z "$GREASY_ENGINE" ]; then
+  GREASY_ENGINE=`cat $GREASY_CONFDIR/greasy.conf | grep Engine | cut -d= -f 2`
+fi
+
+if [ "$GREASY_ENGINE" = "mpi" ]; then
+  MPIRUN=@machine_mpirun@
+else
+  MPIRUN=""
+fi
+
+# If running inside a slurm job, append the jobid to the log.
+if [[ -z "$GREASY_LOGFILE" && -n "$SLURM_JOBID" ]]
+then
+   export GREASY_LOGFILE=greasy-$SLURM_JOBID.log
+fi
+
+# Use Slurm configuration to setup worker and node if present
+if [ -n "$SLURM_NPROCS" ]; then
+  export GREASY_NWORKERS=$SLURM_NPROCS
+  export GREASY_NODELIST=`srun hostname | tr "\n" ","`
+fi
+
+# Run Greasy
+$MPIRUN $EXE $@
+ 

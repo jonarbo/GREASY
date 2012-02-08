@@ -4,79 +4,55 @@
 # @ output = greasy-%j.out
 # @ error  = greasy-%j.err
 
-##########################################################
-# Fill here with a number of cpus according to your needs
-# Keep in mind that one task is reserved for the master
-# if using the mpi engine
-##########################################################
+##################################################
+# Fill here with a number of cpus according to   #
+# your needs.                                    #
+# Keep in mind that one task is reserved for the #
+# master if using the mpi engine.                #
+##################################################
 
 # @ total_tasks = 4
 
-#########################################
-# and set an appropiate wall_clock_limit
-#########################################
+##################################################
+# and set an appropiate wall_clock_limit         #
+##################################################
 
-# @ wall_clock_limit = 01:10:00
+# @ wall_clock_limit = 00:05:00
 
-###########################################
-# Here goes the path to the file where you 
-# have the list of tasks
-###########################################
+##################################################
+# Here goes the path to the file where you have  #
+# the list of tasks.                             #
+##################################################
 
 FILE=short-example.txt
 
-###########################################
-# Here goes the path to the place where the 
-# logs will be written
-# By default, if not set, it will use:
-# ./greasy.log
-###########################################
+##################################################
+# Here goes the path to the place where the logs #
+# will be written.                               #
+# By default, if not set, it will use:           #
+# ./greasy.log                                   #
+# or                                             #
+# ./greasy-<jobid>.log if inside slurm job       #
+##################################################
 
-if [ -z "GREASY_LOGFILE" ]; then
+# export GREASY_LOGFILE=greasy.log
 
-export GREASY_LOGFILE=greasy-$SLURM_JOBID.log
-
-fi
-
-##############################################
-# If running this script interactively, please
-# set the desired number of workers. The number
-# of workers should not be higher than the 
-# available cpus.
-# If remote spawning is available, set up the
-# comma-separated hostlist as well.
-##############################################
+##################################################
+# If running this script interactively, please   #
+# set the desired number of workers. The number  #
+# of workers should not be higher than the       #
+# available cpus.                                #
+# If remote spawning is available, set up the    #
+# comma-separated hostlist as well.              #
+##################################################
 
 # export GREASY_NWORKERS=4
 # export GREASY_NODELIST=node1,node2,node3
 
-#################################
-#################################
-#################################
-# Do not edit beyond this line
-#################################
+##################################################
+# Run greasy!                                    #
+##################################################
 
-# Some setup parameters
-
-GREASY_BINDIR=@greasy_bindir@
-GREASY_CONFDIR=@greasy_etcdir@
-EXE=$GREASY_BINDIR/greasy
-
-GREASY_ENGINE=`cat $GREASY_CONFDIR/greasy.conf | grep Engine | cut -d= -f 2`
-
-if [ "$GREASY_ENGINE" = "mpi" ]; then
-  MPIRUN=@machine_mpirun@
-else
-  MPIRUN=""
-fi
-
-if [ -n "$SLURM_NPROCS" ]; then
-  export GREASY_NWORKERS=$SLURM_NPROCS
-  export GREASY_NODELIST=`srun hostname | tr "\n" ","`
-fi
-
-# Run Greasy
-
-$MPIRUN $EXE $FILE
+@greasy_bindir@/greasy $FILE
 
 
