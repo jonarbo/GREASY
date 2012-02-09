@@ -12,6 +12,8 @@ AC_SUBST(greasy_engine,[basic])
 # Checks for programs.
 AC_PROG_CC
 
+AC_PROG_LIBTOOL
+#LT_INIT
 # Checks for MPI-ENGINE
 
 AC_ARG_ENABLE(mpi-engine,
@@ -142,5 +144,6 @@ fi
 
 AC_SUBST(greasy_bindir,[$prefix/bin])
 AC_SUBST(greasy_etcdir,[$prefix/etc])
+AC_SUBST(greasy_libdir,[$prefix/lib])
 
 AC_OUTPUT(Makefile src/Makefile etc/Makefile etc/greasy.conf doc/Makefile example/Makefile example/bsc_greasy.job bin/Makefile)

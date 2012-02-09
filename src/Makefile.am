@@ -21,10 +21,21 @@ greasy_DEPENDENCIES = tbb
 tbb_root = $(CURDIR)/@my_tbb_root@
 include @my_tbb_root@/build/common.inc	
 
-AM_CPPFLAGS += -DTHREAD_ENGINE -I@my_tbb_root@/include 
-AM_LDFLAGS  = -L@my_tbb_root@/build/$(tbb_build_prefix)_release -ltbb 
+AM_CPPFLAGS  += -DTHREAD_ENGINE -I@my_tbb_root@/include 
+AM_LDFLAGS    = -L@my_tbb_root@/build/$(tbb_build_prefix)_release -ltbb 
 
-.PHONY: tbb
+#LIBRARY=  @my_tbb_root@/build/$(tbb_build_prefix)_release/libtbb.so
+
+plugindir=  /home/jonarbo/Projects/BSC/GREASY/greasy/branch/greasy-git/GREASY/@my_tbb_root@/build/$(tbb_build_prefix)_release  
+plugin_LTLIBRARIES= tbb.la
+tbb_la_LDFLAGS= -module
+
+
+#install-exec-local:
+#	@mkdir -p @greasy_lib@
+#	@cp @my_tbb_root@/build/$(tbb_build_prefix)_release/libtbb.so @greasy_lib@/
+
+.PHONY: tbb tbb.lo
 tbb:
 	@echo "Compiling local version of TBB..."
 	@cd @my_tbb_root@ && $(MAKE) $(AM_MAKEFLAGS) tbb && cd - 
