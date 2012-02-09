@@ -6,11 +6,6 @@ ThreadEngine::ThreadEngine ( const string& filename) : AbstractEngine(filename){
   
   engineType="thread";
 
-  // Set the number of workers
-  if (config->keyExists("NWorkers"))
-    nworkers = fromString(nworkers, config->getValue("NWorkers"));
-  else getDefaultNWorkers();
-
 }
 
 void ThreadEngine::run(){

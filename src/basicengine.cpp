@@ -14,17 +14,18 @@ BasicEngine::BasicEngine ( const string& filename) : AbstractSchedulerEngine(fil
 
 void BasicEngine::init() {
     
+  char hostname[HOST_NAME_MAX];
+  
   log->record(GreasyLog::devel, "BasicEngine::init", "Entering...");
 
   AbstractSchedulerEngine::init();
   
-  char hostname[HOST_NAME_MAX];
-
   gethostname(hostname, sizeof(hostname));
   masterHostname=hostname;
 
   // Setup the nodelist
   if (config->keyExists("NodeList")) {
+    log->record(GreasyLog::devel, "BasicEngine::init", "Nodelist setup");
     vector<string> nodelist = split(config->getValue("NodeList"),',');
     if (nworkers>nodelist.size()){
       log->record(GreasyLog::error,  "Requested more workers than nodes in the nodelist. Check parameters Nworkers and NodeList");
@@ -85,11 +86,16 @@ void BasicEngine::allocate(GreasyTask* task) {
   pid_t pid = fork();
   
   if (pid == 0) {
-   //Child process will exec command...
-   // We use system instead of exec because of greater compatibility with command to be executed
-   exit(executeTask(task,worker));  
+    // Child:
+    // Disable signal handling in child processes
+    // We only want to have the master in charge of the restarts and messages.
+    signal(SIGTERM, SIG_DFL);
+    signal(SIGINT, SIG_DFL);
+   
+    // We use system instead of exec because of greater compatibility with command to be executed
+    exit(executeTask(task,worker));  
   } else if (pid > 0) {
-    // parent
+    // Parent:
     log->record(GreasyLog::debug,  "BasicEngine::allocate", "Task " 
 		      + toString(task->getTaskId()) + " to worker " + toString(worker)
 		      + " on node " + getWorkerNode(worker));
@@ -163,7 +169,7 @@ int BasicEngine::executeTask(GreasyTask *task, int worker) {
 	if (config->getValue("BasicRemoteMethod")=="srun") {
 	  command = "srun -n 1 -N 1 -w " + node + " ";
 	} else if (config->getValue("BasicRemoteMethod")=="ssh") {
-	  command = "ssh " + node + " " ;
+	  command = "ssh -q " + node + " " ;
 	} else {
 	  // Should never be here
 	  log->record(GreasyLog::error, "Unknown error. Check BasicRemoteMethod parameter.");

@@ -99,7 +99,7 @@ inline string toUpper(string& s) {
 inline string getWorkingDir() {
  
   char temp[4096];
-  return ( getcwd(temp, 4096) ? std::string( temp ) : std::string("") );
+  return ( getcwd(temp, 4096) ? std::string( temp ) + "/" : std::string("") );
 
 }
 

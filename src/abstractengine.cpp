@@ -56,10 +56,16 @@ AbstractEngine* AbstractEngineFactory::getAbstractEngineInstance(const string& f
 AbstractEngine::AbstractEngine ( string filename ) {
   
   taskFile = filename;
-  restartFile = filename + ".rst";
+  //Check for a relative path
+  if ((GreasyRegex::match(filename,"^[:blank:]/(.*)$")==""))
+    taskFile = getWorkingDir() + filename;
+  
+  vector<string>path = split(filename,'/');
+  restartFile = getWorkingDir() + path.back() + ".rst";
+  
   log = GreasyLog::getInstance();
   config = GreasyConfig::getInstance();
-  engineType="";
+  engineType="abstract";
   nworkers = 0;
   fileErrors= false;
   ready = false;
@@ -81,7 +87,7 @@ void AbstractEngine::init() {
   
   log->record(GreasyLog::devel, "AbstractEngine::init", "Entering...");
   
-  log->record(GreasyLog::silent,"Start greasing " + getWorkingDir() + "/" + taskFile);
+  log->record(GreasyLog::silent,"Start greasing " + taskFile);
   parseTaskFile();
   checkDependencies();
   
@@ -89,13 +95,26 @@ void AbstractEngine::init() {
     log->record(GreasyLog::warning,  "Invalid tasks found. Greasy will ignore them");  
   }
   
+  // Only set the number of workers if any subclass has not changed the value before.
+  if (nworkers == 0){
+    // Set the number of workers
+    if (config->keyExists("NWorkers")) {
+      log->record(GreasyLog::devel, "Using defined NWorkers: " + toString(nworkers));
+      nworkers = fromString(nworkers, config->getValue("NWorkers"));
+    } else { 
+      getDefaultNWorkers();
+      log->record(GreasyLog::warning, "Falling back to the default number of workers " + toString(nworkers));
+      log->record(GreasyLog::warning, "Consider setting environment variable GREASY_NWORKERS to the desired cpus to use");
+    }
+  }
+  
   if (!fileErrors) {
     if(nworkers>0) {  
       ready = true;
-      log->record(GreasyLog::info,  "Engine " + toUpper(engineType) + " is now ready to run with "
+      log->record(GreasyLog::info,  toUpper(engineType) + " engine is ready to run with "
 				  + toString(nworkers) + " workers"); 
     } else {
-      log->record(GreasyLog::error,  "Engine " + toUpper(engineType) + " has no workers. Please check your greasy setup");
+      log->record(GreasyLog::error,  toUpper(engineType) + " engine has no workers. Please check your greasy setup");
     }
   }
   log->record(GreasyLog::devel,  "Configuration contents:\n\n" + config->printContents()); 
@@ -109,7 +128,7 @@ void AbstractEngine::finalize() {
 
   log->record(GreasyLog::devel, "AbstractEngine::finalize", "Entering...");
   
-  log->record(GreasyLog::info, "Engine " + toUpper(engineType) + " finished");  
+  log->record(GreasyLog::info, toUpper(engineType) + " engine finished");  
   
   globalTimer.stop();
   
@@ -120,7 +139,7 @@ void AbstractEngine::finalize() {
     if (it->second) delete(it->second);
   }
   
-  log->record(GreasyLog::silent,"Finished greasing " + getWorkingDir() + "/" + taskFile);
+  log->record(GreasyLog::silent,"Finished greasing " + taskFile);
   
   log->record(GreasyLog::devel, "AbstractEngine::finalize", "Exiting...");
 }
@@ -145,7 +164,7 @@ void AbstractEngine::parseTaskFile() {
   string command="";
 
   if (myfile.is_open()) {
-    log->record(GreasyLog::info, "Reading tasks from file " + taskFile );
+    log->record(GreasyLog::debug, "Reading tasks");
     // Read the task file
     while (!myfile.eof()){
       taskId++;
@@ -203,6 +222,7 @@ void AbstractEngine::parseTaskFile() {
       command.clear();
     }
     myfile.close();
+    log->record(GreasyLog::debug, "Tasks loaded");
   } else {
     log->record(GreasyLog::error,  "Could not read task file " + taskFile);
     fileErrors=true;
@@ -292,16 +312,24 @@ void AbstractEngine::writeRestartFile() {
       return;
   }
   
-  log->record(GreasyLog::info, "Creating restart file " + getWorkingDir() + "/" + restartFile + "...");
+  log->record(GreasyLog::info, "Creating restart file " + restartFile + "...");
   
+  string logFile = "Standard Error";
+  if (config->keyExists("LogFile")&&((config->getValue("LogFile") != ""))) {
+    logFile = config->getValue("LogFile");
+    //Check for a relative path
+    if ((GreasyRegex::match(logFile,"^[:blank:]/(.*)$")==""))
+      logFile = getWorkingDir() + logFile;
+  }
   
   rstfile << "# " << endl;
   rstfile << "# Greasy restart file generated at "<< GreasyTimer::now() << endl;
   rstfile << "# Original task file: " << getWorkingDir() << "/" << taskFile << endl;
+  rstfile << "# Log file: " << logFile  << endl;
   rstfile << "# " << endl;
   rstfile << endl;
   
-  nindex = 6;
+  nindex = 7;
   
   for (it=taskMap.begin();it!=taskMap.end(); it++) {
     task = it->second;

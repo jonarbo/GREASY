@@ -15,10 +15,10 @@ fi
 
 # Decide which type of launcher to use depending on the engine selected.
 if [ -z "$GREASY_ENGINE" ]; then
-  GREASY_ENGINE=`cat $GREASY_CONFDIR/greasy.conf | grep Engine | cut -d= -f 2`
+  GREASY_ENGINE=`cat $GREASY_CONFDIR/greasy.conf | grep "^[[:blank:]]*Engine=.*$"| tail -n1 | cut -d= -f 2 | cut -d" " -f1`
 fi
 
-if [ "$GREASY_ENGINE" = "mpi" ]; then
+if [[ "$GREASY_ENGINE" = "mpi" || "$GREASY_ENGINE" = "MPI" ]]; then
   MPIRUN=@machine_mpirun@
 else
   MPIRUN=""
