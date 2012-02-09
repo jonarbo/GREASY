@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.65])
-AC_INIT([greasy], [2.0], [support@bsc.es])
-AM_INIT_AUTOMAKE(greasy,2.0)
+AC_INIT([greasy], [2.1a], [support@bsc.es])
+AM_INIT_AUTOMAKE(greasy,2.1a)
 AC_CONFIG_SRCDIR([src/greasylog.h])
 AC_CONFIG_HEADERS([config.h])
 
@@ -83,26 +83,26 @@ fi
 
 # Checks for SLURM-ENGINE
 
-AC_ARG_ENABLE(slurm-engine,
-  [  --enable-slurm-engine			enable SLURM engine (Not yet implemented)],
-  [slurm_engine=${enableval}],
-  [slurm_engine=no])
+# AC_ARG_ENABLE(slurm-engine,
+#   [  --enable-slurm-engine			enable SLURM engine (Not yet implemented)],
+#   [slurm_engine=${enableval}],
+#   [slurm_engine=no])
 
 # WARNING: implement slurm engine before enabling in Makefile.am
-AM_CONDITIONAL(SLURM_ENGINE, test x$slurm_engine = xyes)
-
-if test x$slurm_engine = xyes; then
-
-  AC_CHECK_PROG(srun_present,[srun],[yes],[no])
-  if test x$srun_present = xno; then
-    AC_MSG_ERROR([Fatal Error: srun command not found])
-    exit;
-  fi
+# AM_CONDITIONAL(SLURM_ENGINE, test x$slurm_engine = xyes)
+# 
+# if test x$slurm_engine = xyes; then
+# 
+#   AC_CHECK_PROG(srun_present,[srun],[yes],[no])
+#   if test x$srun_present = xno; then
+#     AC_MSG_ERROR([Fatal Error: srun command not found])
+#     exit;
+#   fi
 
 # TODO: implement slurm engine before enabling
 #   AC_SUBST(greasy_engine,[slurm])
 
-fi
+# fi
 
 # Checks for THREAD-ENGINE
 
@@ -146,4 +146,4 @@ AC_SUBST(greasy_bindir,[$prefix/bin])
 AC_SUBST(greasy_etcdir,[$prefix/etc])
 AC_SUBST(greasy_libdir,[$prefix/lib])
 
-AC_OUTPUT(Makefile src/Makefile etc/Makefile etc/greasy.conf doc/Makefile example/Makefile example/bsc_greasy.job bin/Makefile)
+AC_OUTPUT(Makefile src/Makefile etc/Makefile etc/greasy.conf doc/Makefile example/Makefile example/bsc_greasy.job bin/Makefile bin/greasy)

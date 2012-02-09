@@ -1,3 +1,3 @@
-bin_SCRIPTS = greasycolorlog
-EXTRA_DIST = greasycolorlog
+bin_SCRIPTS = greasycolorlog greasy
+EXTRA_DIST = greasycolorlog greasy
 

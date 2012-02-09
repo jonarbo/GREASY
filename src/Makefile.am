@@ -1,23 +1,23 @@
 AM_CPPFLAGS = -DSYSTEM_CFG=\"@sysconfdir@/greasy.conf\"
 
-bin_PROGRAMS = greasy 
-greasy_SOURCES = abstractengine.cpp abstractengine.h abstractschedulerengine.cpp abstractschedulerengine.h basicengine.cpp basicengine.h greasyconfig.cpp greasyconfig.h greasy.cpp greasylog.cpp greasylog.h greasyregex.cpp greasyregex.h greasytask.cpp greasytask.h greasytimer.cpp greasytimer.h greasyutils.h  
+bin_PROGRAMS = greasybin
+greasybin_SOURCES = abstractengine.cpp abstractengine.h abstractschedulerengine.cpp abstractschedulerengine.h basicengine.cpp basicengine.h greasyconfig.cpp greasyconfig.h greasy.cpp greasylog.cpp greasylog.h greasyregex.cpp greasyregex.h greasytask.cpp greasytask.h greasytimer.cpp greasytimer.h greasyutils.h  
 
 if MPI_ENGINE
-greasy_SOURCES += mpiengine.cpp mpiengine.h
+greasybin_SOURCES += mpiengine.cpp mpiengine.h
 AM_CPPFLAGS += -DMPI_ENGINE
 endif
 
 # if SLURM_ENGINE
-# greasy_SOURCES += slurmengine.cpp slurmengine.h 
+# greasybin_SOURCES += slurmengine.cpp slurmengine.h 
 # AM_CPPFLAGS += -DSLURM_ENGINE
 # endif
 
 if THREAD_ENGINE
-greasy_SOURCES += threadengine.cpp threadengine.h 
+greasybin_SOURCES += threadengine.cpp threadengine.h 
 
 if TBB_LOCAL
-greasy_DEPENDENCIES = tbb 
+greasybin_DEPENDENCIES = tbb 
 tbb_root = $(CURDIR)/@my_tbb_root@
 include @my_tbb_root@/build/common.inc	
 
