@@ -1,13 +1,12 @@
 #!/bin/bash
 
 # Some setup parameters
+COMMAND=`echo $_ | rev | cut -d"/" -f1 | rev`
 GREASY_BINDIR=@greasy_bindir@
 GREASY_CONFDIR=@greasy_etcdir@
 EXE=$GREASY_BINDIR/greasybin
 
 # Check if the script is launched using any kind of spawner
-COMMAND=`echo $_ | cut -d" " -f1 | rev | cut -d"/" -f1 |  rev`
-
 if [ "$COMMAND" != "greasy" ]; then
   echo "Usage: greasy <taskfile.txt>"
   echo "Please rerun greasy without putting $COMMAND before"
