@@ -12,8 +12,11 @@ AC_SUBST(greasy_engine,[basic])
 # Checks for programs.
 AC_PROG_CC
 
-AC_PROG_LIBTOOL
-#LT_INIT
+AC_CONFIG_MACRO_DIR([m4])
+LT_INIT([dlopen])
+AC_DISABLE_STATIC
+
+
 # Checks for MPI-ENGINE
 
 AC_ARG_ENABLE(mpi-engine,

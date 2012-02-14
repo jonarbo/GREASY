@@ -8,6 +8,8 @@
 #include "greasyutils.h"
 #include "config.h"
 
+#define NUM_LEVELS 6
+
 using namespace std;
 
 

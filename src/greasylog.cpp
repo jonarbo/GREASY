@@ -2,7 +2,7 @@
 #include "greasytimer.h"
 
 // Description of each one of the levels.
-const string GreasyLog::logLevelsDesc[6] = {"", "ERROR: ", "WARNING: ","INFO: ","DEBUG: ","DEVEL: "};
+const string GreasyLog::logLevelsDesc[NUM_LEVELS] = {"", "ERROR: ", "WARNING: ","INFO: ","DEBUG: ","DEVEL: "};
 
 GreasyLog::GreasyLog()
 {
@@ -36,7 +36,7 @@ int GreasyLog::getCurrentLogLevel() {
 void GreasyLog::setLogLevel(LogLevels level) {
 
   string leveldesc;
-  if (level!=logLevel) {
+  if ((level!=logLevel)&&(level>=0)&&(level<NUM_LEVELS)) {
     if (level) leveldesc =logLevelsDesc[level];
     else leveldesc = "SILENT";
     logLevel=level;
