@@ -145,7 +145,6 @@ void BasicEngine::waitForAnyWorker() {
   task->setReturnCode(retcode);
   task->setElapsedTime(workerTimers[worker].secsElapsed());
   task->setHostname(getWorkerNode(worker));
-  task->setHostname(masterHostname);
 
   // Run task epilogue stuff
   taskEpilogue(task);
