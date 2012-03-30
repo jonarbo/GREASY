@@ -57,7 +57,7 @@ AbstractEngine::AbstractEngine ( string filename ) {
   
   taskFile = filename;
   //Check for a relative path
-  if ((GreasyRegex::match(filename,"^[:blank:]/(.*)$")==""))
+  if ((GreasyRegex::match(filename,"^[:blank:]*/(.*)$")==""))
     taskFile = getWorkingDir() + filename;
   
   vector<string>path = split(filename,'/');
