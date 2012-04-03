@@ -318,7 +318,7 @@ void AbstractEngine::writeRestartFile() {
   if (config->keyExists("LogFile")&&((config->getValue("LogFile") != ""))) {
     logFile = config->getValue("LogFile");
     //Check for a relative path
-    if ((GreasyRegex::match(logFile,"^[:blank:]/(.*)$")==""))
+    if ((GreasyRegex::match(logFile,"^[:blank:]*/(.*)$")==""))
       logFile = getWorkingDir() + logFile;
   }
   
