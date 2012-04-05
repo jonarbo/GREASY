@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.65])
-AC_INIT([greasy], [2.1a], [support@bsc.es])
-AM_INIT_AUTOMAKE(greasy,2.1a)
+AC_INIT([greasy], [2.1], [support@bsc.es])
+AM_INIT_AUTOMAKE(greasy,2.1)
 AC_CONFIG_SRCDIR([src/greasylog.h])
 AC_CONFIG_HEADERS([config.h])
 
@@ -13,8 +13,8 @@ AC_SUBST(greasy_engine,[basic])
 AC_PROG_CC
 
 AC_CONFIG_MACRO_DIR([m4])
-LT_INIT([dlopen])
-AC_DISABLE_STATIC
+# LT_INIT([dlopen])
+# AC_DISABLE_STATIC
 
 
 # Checks for MPI-ENGINE
@@ -59,7 +59,7 @@ fi
 AC_CHECK_HEADERS([limits.h sys/time.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_STDBOOL
+# AC_HEADER_STDBOOL
 AC_C_INLINE
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
@@ -135,9 +135,15 @@ if test x$thread_engine = xyes; then
 	AC_SUBST(tbb_include,[$tbb/include])
 	AC_SUBST(tbb_libs,[$tbb/libs])
    else
-	echo "Using TBB provided by GREASY...will compile TBB sources"
+	echo "Using bundled TBB provided by GREASY..."
 	AC_SUBST(my_tbb_root,[3rdparty/tbb])
 	AM_CONDITIONAL(TBB_LOCAL, true )
+	AC_SUBST(tbb_libs,[$prefix/lib])
+	echo "Uncompressing TBB source..."
+	cd src/3rdparty
+	tar xvzf tbb40_20111130oss_src.tgz >/dev/null
+	ln -s tbb40_20111130oss tbb 2>/dev/null
+	cd - > /dev/null
    fi
 else
    if test x$tbb != xno; then 

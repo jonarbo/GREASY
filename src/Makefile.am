@@ -1,5 +1,5 @@
 AM_CPPFLAGS = -DSYSTEM_CFG=\"@sysconfdir@/greasy.conf\"
-
+EXTRA_DIST = 3rdparty/tbb40_20111130oss_src.tgz
 bin_PROGRAMS = greasybin
 greasybin_SOURCES = abstractengine.cpp abstractengine.h abstractschedulerengine.cpp abstractschedulerengine.h basicengine.cpp basicengine.h greasyconfig.cpp greasyconfig.h greasy.cpp greasylog.cpp greasylog.h greasyregex.cpp greasyregex.h greasytask.cpp greasytask.h greasytimer.cpp greasytimer.h greasyutils.h  
 
@@ -22,23 +22,27 @@ tbb_root = $(CURDIR)/@my_tbb_root@
 include @my_tbb_root@/build/common.inc	
 
 AM_CPPFLAGS  += -DTHREAD_ENGINE -I@my_tbb_root@/include 
-AM_LDFLAGS    = -L@my_tbb_root@/build/$(tbb_build_prefix)_release -ltbb 
+AM_LDFLAGS    = -L@my_tbb_root@/build/$(tbb_build_prefix)_release -Wl,-rpath,@greasy_libdir@ -ltbb 
 
 ACLOCAL_AMFLAGS = -I m4
 
-#lib_LTLIBRARIES = libtbbproxy.la
-#libtbbproxy_la_SOURCES  = dummy.cpp
-#libtbb_la_LIBADD   = -ltbb 
-#libtbb_la_LDFLAGS =  -L@my_tbb_root@/build/$(tbb_build_prefix)_release -ltbb
-#greasybin_LDADD	   =  libtbb.la
-#greasybin_LDFLAGS  =  -ltbbproxy
-#greasybin_LDFLAGS  = -L@my_tbb_root@/build/$(tbb_build_prefix)_release -ltbb 
-#greasybin_LDADD	   = libtbb.so.2
-#libtbb.la
+# lib_LTLIBRARIES = libtbbproxy.la
+# libtbbproxy_la_SOURCES  = dummy.cpp
+# libtbb_la_LIBADD   = -ltbb 
+# libtbb_la_LDFLAGS =  -L@my_tbb_root@/build/$(tbb_build_prefix)_release -ltbb
+# greasybin_LDADD	   =  libtbb.la
+# greasybin_LDFLAGS  =  -ltbbproxy
+greasybin_LDFLAGS  = -L@my_tbb_root@/build/$(tbb_build_prefix)_release -Wl,-rpath,@greasy_libdir@ -ltbb 
+# greasybin_LDADD	   = libtbb.so.2
+# libtbb.la
 
-#install-exec-local:
-#	test -z @greasy_libdir@ || $(MKDIR_P) @greasy_libdir@
-#	$(INSTALL_PROGRAM) @my_tbb_root@/build/$(tbb_build_prefix)_release/libtbb.so  "@greasy_libdir@"
+install-exec-local:
+	test -z @greasy_libdir@ || $(MKDIR_P) @greasy_libdir@
+	$(INSTALL_PROGRAM) @my_tbb_root@/build/$(tbb_build_prefix)_release/libtbb.so  "@greasy_libdir@"
+	$(INSTALL_PROGRAM) @my_tbb_root@/build/$(tbb_build_prefix)_release/libtbb.so.2  "@greasy_libdir@"
+
+clean-local:
+	@cd @my_tbb_root@ && $(MAKE) $(AM_MAKEFLAGS) clean && cd -
 	
 .PHONY: tbb 
 
@@ -48,7 +52,7 @@ tbb:
 else
 
 AM_CPPFLAGS += -DTHREAD_ENGINE -I@tbb_include@
-AM_LDFLAGS  = -R@tbb_libs@ -L@tbb_libs@ -ltbb 
+AM_LDFLAGS  = -Wl,-rpath,@tbb_libs@ -L@tbb_libs@ -ltbb 
 
 endif 
 
