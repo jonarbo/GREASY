@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Some setup parameters
-COMMAND=`echo $_ | rev | cut -d"/" -f1 | rev`
+#COMMAND=`echo $_ | rev | cut -d"/" -f1 | rev`
+COMMAND=`echo $0 | rev | cut -d"/" -f1 | rev`
 GREASY_BINDIR=@greasy_bindir@
 GREASY_CONFDIR=@greasy_etcdir@
 EXE=$GREASY_BINDIR/greasybin

@@ -1,7 +1,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.65])
+#AC_PREREQ([2.65])
+AC_PREREQ([2.63])
 AC_INIT([greasy], [2.1], [support@bsc.es])
 AM_INIT_AUTOMAKE(greasy,2.1)
 AC_CONFIG_SRCDIR([src/greasylog.h])
@@ -123,17 +124,33 @@ AC_ARG_WITH([tbb],
    [tbb=$withval], 
    [tbb=no])
 
+AC_ARG_WITH([tbb_libsdir],
+   [AS_HELP_STRING([--with-tbb_libsdir], [Path to the usable TBB libs dir])], 
+   [tbb_libsdir=$withval], 
+   [tbb_libsdir=no])
+
 
 AM_CONDITIONAL(TBB_LOCAL, false )
 if test x$thread_engine = xyes; then
 
   AC_DEFINE(THREAD_ENGINE, 1, Thread Engine enabled with TBB)
-
+	
    if test x$tbb != xno; then 
-	# use system TBB
-	echo "Using system TBB in $tbb"
-	AC_SUBST(tbb_include,[$tbb/include])
-	AC_SUBST(tbb_libs,[$tbb/libs])
+   	if test x$tbb != xyes; then 
+		# use system TBB
+		echo "Using system TBB in $tbb"
+		AC_SUBST(tbb_include,[$tbb/include])
+		AC_SUBST(tbb_libs,[$tbb/libs])
+		AC_SUBST(LDFLAGS,["-L$tbb_libs -ltbb"])
+	else	
+		if test x$tbb_libsdir != xno; then 
+			echo "Using TBB with libs in $tbb_libsdir"
+			AC_SUBST(tbb_libsdir,[$tbb_libsdir])
+			AC_SUBST(LDFLAGS,["-L$tbb_libsdir -ltbb"])
+		else  
+			echo "Warning: System TBB to be used but not info provided to find the libs"
+		fi
+	fi				
    else
 	echo "Using bundled TBB provided by GREASY..."
 	AC_SUBST(my_tbb_root,[3rdparty/tbb])
